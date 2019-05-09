@@ -9,6 +9,17 @@ Conditional compilation	Syntax: #ifdef, #endif, #if, #else, #ifndef
 Set of commands are included or excluded in source program before compilation with respect to the condition.
 Other directives	Syntax: #undef, #pragma
 #undef is used to undefine a defined macro variable. #Pragma is used to call a function before and after main function in a C program.
+
+A translation unit is any preprocessed source file.
+A translation unit is the basic unit of compilation in C++.
+This unit is made up of the contents of a single source file after it passes through preprocessing.
+It contains included any header files without blocks that are ignored using conditional preprocessing statements like ifdef, ifndef, etc.
+A single translation unit can be compiled into an object file, library, or executable program.
+
+The Difference between Class and Structure.
+Class can create a subclass that will inherit parent's properties and methods,
+whereas Structure does not support the inheritance.
+A class has all members private by default. A struct is a class where members are public by default.
 */
 
 #include "racingexample.h"
@@ -24,6 +35,7 @@ Other directives	Syntax: #undef, #pragma
 #include "overloadfunction.h"
 #include "enumaration.h"
 #include "template.h"
+#include "testclass.h"
 
 //MVC Model-View-Controller
 #include "view.h"
@@ -31,49 +43,15 @@ Other directives	Syntax: #undef, #pragma
 #include "controller.h"
 #include "common.h"
 
+extern int ex_a;  // external outside, here we do not reserve memory for variable ex_a;
 
-void showHelp()
-{
-    cout << "This is help function." << endl;
-}
-
-void DataChange(string data) {
-    cout << "Data Changes: " << data <<endl;
-}
-
-//change the value of var.
-void multiplyBy(int *var, int amount)
-{
-    *var *= amount;
-}
-
-//we should sent size
-void multiplyArrayBy(int *array, int amount, int size)
-{
-    while(size--)
-        array[size] *= amount;
-}
-
-void printTypes()
-{
-    printf("CHAR_BIT    :   %d\n", CHAR_BIT);
-    printf("CHAR_MAX    :   %d\n", CHAR_MAX);
-    printf("CHAR_MIN    :   %d\n", CHAR_MIN);
-    printf("INT_MAX     :   %d\n", INT_MAX);
-    printf("INT_MIN     :   %d\n", INT_MIN);
-    printf("LONG_MAX    :   %ld\n", static_cast<long>(LONG_MAX));
-    printf("LONG_MIN    :   %ld\n", static_cast<long>(LONG_MIN));
-    printf("SCHAR_MAX   :   %d\n", SCHAR_MAX);
-    printf("SCHAR_MIN   :   %d\n", SCHAR_MIN);
-    printf("SHRT_MAX    :   %d\n", SHRT_MAX);
-    printf("SHRT_MIN    :   %d\n", SHRT_MIN);
-    printf("UCHAR_MAX   :   %d\n", UCHAR_MAX);
-    printf("UINT_MAX    :   %u\n", static_cast<unsigned int>(UINT_MAX));
-    printf("ULONG_MAX   :   %lu\n", static_cast<unsigned long>(ULONG_MAX));
-    printf("USHRT_MAX   :   %d\n", static_cast<unsigned short>( USHRT_MAX));
-
-    cout << endl;
-}
+void showHelp();
+void DataChange(string data) ;
+void multiplyBy(int *var, int amount);
+void multiplyArrayBy(int *array, int amount, int size);
+void printTypes();
+//friend function defined in TestClass
+void setX(TestClass &, int);
 
 //int argc is how many paremeters sended
 //char *argv[] is arguments values
@@ -270,24 +248,6 @@ int main(int argc, char *argv[])
     }
 
     {
-        //chainofresponsibility
-        Handler *h1 = new SpecialHandler(10, 1);
-        Handler *h2 = new SpecialHandler(20, 2);
-        Handler *h3 = new SpecialHandler(30, 3);
-
-        h1->setNextHandler(h2);
-        h2->setNextHandler(h3);
-
-        h1->request(18);
-
-        h1->request(40);
-
-        delete h1;
-        delete h2;
-        delete h3;
-    }
-
-    {
         int nr1 = 5, nr2 = 7;
         int &nickname = nr1;
         nickname = nr2;
@@ -456,8 +416,103 @@ int main(int argc, char *argv[])
         //1 -first string is greater
         //-1 -first string is lower
 
+    }
+
+    {
+        //chainofresponsibility
+        Handler *h1 = new SpecialHandler(10, 1);
+        Handler *h2 = new SpecialHandler(20, 2);
+        Handler *h3 = new SpecialHandler(30, 3);
+
+        h1->setNextHandler(h2);
+        h2->setNextHandler(h3);
+
+        h1->request(18);
+        h1->request(40);
+
+
+        delete h1;
+        delete h2;
+        delete h3;
     }*/
 
+    {
+        TestClass dog(10, 50, 100);
+        TestClass copyOfDog = dog; // copy constructure;
+        const TestClass house(5, 25, 100); // House can not move setposition is not available;
+        *(copyOfDog.p) = 700;
+
+        cout << "Dog position:" << endl;
+        dog.getPosition();
+        cout << "p: " << *(dog.p) << endl;
+
+        cout << "Copy Dog position:" << endl;
+        copyOfDog.getPosition();
+        cout << "p: " << *(copyOfDog.p) << endl;
+
+        dog.setPosition(50, 100);
+        setX(dog, 444);
+        cout << "New Dog position:" << endl;
+        dog.getPosition();
+        cout << "p: " << *(dog.p) << endl;
+
+        cout << "House position:" << endl;
+        house.getPosition();
+        cout << "p: " << *(house.p) << endl;
+    }
 
     return 0;
+}
+
+//friend function defined in TestClass
+//A non-member function can access the private and protected members of a class if it is declared a friend of that class.
+//That is done by including a declaration of this external function within the class,
+//and preceding it with the keyword friend:
+void setX(TestClass &obj, int value)
+{
+    obj.x = value;
+    cout << "setting x value by friend class to : " << value << endl;
+}
+
+void showHelp()
+{
+    cout << "This is help function." << endl;
+}
+
+void DataChange(string data) {
+    cout << "Data Changes: " << data <<endl;
+}
+
+//change the value of var.
+void multiplyBy(int *var, int amount)
+{
+    *var *= amount;
+}
+
+//we should sent size
+void multiplyArrayBy(int *array, int amount, int size)
+{
+    while(size--)
+        array[size] *= amount;
+}
+
+void printTypes()
+{
+    printf("CHAR_BIT    :   %d\n", CHAR_BIT);
+    printf("CHAR_MAX    :   %d\n", CHAR_MAX);
+    printf("CHAR_MIN    :   %d\n", CHAR_MIN);
+    printf("INT_MAX     :   %d\n", INT_MAX);
+    printf("INT_MIN     :   %d\n", INT_MIN);
+    printf("LONG_MAX    :   %ld\n", static_cast<long>(LONG_MAX));
+    printf("LONG_MIN    :   %ld\n", static_cast<long>(LONG_MIN));
+    printf("SCHAR_MAX   :   %d\n", SCHAR_MAX);
+    printf("SCHAR_MIN   :   %d\n", SCHAR_MIN);
+    printf("SHRT_MAX    :   %d\n", SHRT_MAX);
+    printf("SHRT_MIN    :   %d\n", SHRT_MIN);
+    printf("UCHAR_MAX   :   %d\n", UCHAR_MAX);
+    printf("UINT_MAX    :   %u\n", static_cast<unsigned int>(UINT_MAX));
+    printf("ULONG_MAX   :   %lu\n", static_cast<unsigned long>(ULONG_MAX));
+    printf("USHRT_MAX   :   %d\n", static_cast<unsigned short>( USHRT_MAX));
+
+    cout << endl;
 }

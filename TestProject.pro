@@ -4,7 +4,8 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-        main.cpp
+        main.cpp \
+        testclass.cpp
 
 HEADERS += \
     chainofresponsibility.h \
@@ -23,4 +24,5 @@ HEADERS += \
     racingexample.h \
     singleton.h \
     template.h \
+    testclass.h \
     view.h
