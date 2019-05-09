@@ -11,13 +11,16 @@ HEADERS += \
     command.h \
     common.h \
     controller.h \
+    enumaration.h \
     exceptions.h \
     interpreter.h \
     iterator.h \
     libraries.h \
     model.h \
-    overload.h \
+    overloadfunction.h \
+    overloadoperator.h \
     passvalue.h \
     racingexample.h \
     singleton.h \
+    template.h \
     view.h

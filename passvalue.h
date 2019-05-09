@@ -4,27 +4,26 @@
 
 int global_Var = 42;
 
-// function to change pointer value
+//passing the reference of the pointer
+void changeReferenceValue(int & pp) {
+    pp = global_Var;
+}
+
 //passing a copy of the pointer is passed to the function
-void changePointerValue(int* pp)
+void changePointerValue(int * pp)
 {
     *pp = global_Var;
 }
 
-// function to change pointer to pointer value
 //passing the address of the pointer to the function instead of a copy of the actual functio
-void changePointerValue(int** ptr_ptr)
+void changePointerValue(int** pp)
 {
-    *ptr_ptr = &global_Var;
+    *pp = &global_Var;
 }
 
 void changeReferenceValue(int*& pp)
 {
     pp = &global_Var;
-}
-
-void changeReferenceValue(int &x) {
-    x = global_Var;
 }
 
 // function to return a pointer

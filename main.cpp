@@ -4,9 +4,13 @@
 #include "command.h"
 #include "interpreter.h"
 #include "iterator.h"
-#include "overload.h"
+#include "overloadfunction.h"
 #include "exceptions.h"
 #include "passvalue.h"
+#include "overloadoperator.h"
+#include "overloadfunction.h"
+#include "enumaration.h"
+#include "template.h"
 
 //MVC Model-View-Controller
 #include "view.h"
@@ -15,173 +19,376 @@
 #include "common.h"
 
 
+
 void DataChange(string data) {
     cout << "Data Changes: " << data <<endl;
 }
 
+//change the value of var.
+void multiplyBy(int *var, int amount)
+{
+    *var *= amount;
+}
+
+//we should sent size
+void multiplyArrayBy(int *array, int amount, int size)
+{
+    while(size--)
+        array[size] *= amount;
+}
+
+void printTypes()
+{
+    printf("CHAR_BIT    :   %d\n", CHAR_BIT);
+    printf("CHAR_MAX    :   %d\n", CHAR_MAX);
+    printf("CHAR_MIN    :   %d\n", CHAR_MIN);
+    printf("INT_MAX     :   %d\n", INT_MAX);
+    printf("INT_MIN     :   %d\n", INT_MIN);
+    printf("LONG_MAX    :   %ld\n", static_cast<long>(LONG_MAX));
+    printf("LONG_MIN    :   %ld\n", static_cast<long>(LONG_MIN));
+    printf("SCHAR_MAX   :   %d\n", SCHAR_MAX);
+    printf("SCHAR_MIN   :   %d\n", SCHAR_MIN);
+    printf("SHRT_MAX    :   %d\n", SHRT_MAX);
+    printf("SHRT_MIN    :   %d\n", SHRT_MIN);
+    printf("UCHAR_MAX   :   %d\n", UCHAR_MAX);
+    printf("UINT_MAX    :   %u\n", static_cast<unsigned int>(UINT_MAX));
+    printf("ULONG_MAX   :   %lu\n", static_cast<unsigned long>(ULONG_MAX));
+    printf("USHRT_MAX   :   %d\n", static_cast<unsigned short>( USHRT_MAX));
+
+    cout << endl;
+}
+
+
 int main()
 {
-    RacingExample EO;
-    bool(RacingExample::*func_pointer1)();
-    func_pointer1 = &RacingExample::Add;
-    auto thread_one = std::thread (func_pointer1, &EO);
+    {
+        std::cout << "Current C++ version is: ";
+        if (__cplusplus == 201703L) std::cout << "C++17\n";
+        else if (__cplusplus == 201402L) std::cout << "C++14\n";
+        else if (__cplusplus == 201103L) std::cout << "C++11\n";
+        else if (__cplusplus == 199711L) std::cout << "C++98\n";
+        else std::cout << "pre-standard C++\n";
+    }
 
-    bool(RacingExample::*func_pointer2)();
-    func_pointer2 = &RacingExample::Sub;
-    auto thread_two = std::thread (func_pointer2, &EO);
+    /*{
+        char cont = {};
+        do
+        {
+            //system("cls");
+            printTypes();
 
-    thread_one.join();
-    thread_two.join();
+            cout << "Do you want to print again? (Y/N)" << endl;
+            cin >> cont;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-    Singleton* singleton = Singleton::GetInstance();
+        }while(cont != 'n' && cont != 'N');
+    }
+
+
+    {
+        char a;   //character 1 byte -128 to 127
+        int b;    //integer 4 bytes -2147483648 to 2147483647
+        short c;  //short integer 2 bytes -32768 to 32768
+        float d;  //floating point 4 bytes +/- 3.4e +/- 38 (~7 digits)
+        double f; //double floating point 8 bytes +/- 1.7e +/- 308 (~15 digits)
+        unsigned g; // integer 2 bytes 0 to 65535
+
+        for(int i = 1; i <= 10; i++)
+        {
+            if(i == 5)continue;
+
+            for(int j = 1; j <= 10; j++)
+            {
+                cout.width(4);
+                cout << i * j;
+            }
+            cout << endl;
+        }
+
+        int biArray[3][4] = {};
+        cout << biArray[0][0] << endl;
+    }
+
+    {
+        RacingExample EO;
+        bool(RacingExample::*func_pointer1)();
+        func_pointer1 = &RacingExample::Add;
+        auto thread_one = std::thread (func_pointer1, &EO);
+
+        bool(RacingExample::*func_pointer2)();
+        func_pointer2 = &RacingExample::Sub;
+        auto thread_two = std::thread (func_pointer2, &EO);
+
+        thread_one.join();
+        thread_two.join();
+    }
+
+    {
+        Singleton* singleton = Singleton::GetInstance();
         cout << "The value of the singleton: " << singleton->a << endl;
 
-    Handler *h1 = new SpecialHandler(10, 1);
-    Handler *h2 = new SpecialHandler(20, 2);
-    Handler *h3 = new SpecialHandler(30, 3);
+        Light lamp;
+        FlipUpCommand switchUp(lamp);
+        FlipDownCommand switchDown(lamp);
 
-    h1->setNextHandler(h2);
-    h2->setNextHandler(h3);
-
-    h1->request(18);
-
-    h1->request(40);
-
-    delete h1;
-    delete h2;
-    delete h3;
-
-    /*Light lamp;
-    FlipUpCommand switchUp(lamp);
-    FlipDownCommand switchDown(lamp);
-
-    Switch s(switchUp, switchDown);
-    s.flipUp();
-    s.flipDown();
-
-    using namespace wikibooks_design_patterns;
-
-    Evaluator sentence("w x z - +");
-
-    static
-            const int sequences[][3] = {
-        {5, 10, 42}, {1, 3, 2}, {7, 9, -5},
-    };
-
-    for (size_t i = 0; sizeof(sequences)/sizeof(sequences[0]) > i; ++i) {
-        Map variables;
-        variables["w"] = new Number(sequences[i][0]);
-        variables["x"] = new Number(sequences[i][1]);
-        variables["z"] = new Number(sequences[i][2]);
-        int result = sentence.interpret(variables);
-        for (Map::iterator it = variables.begin(); variables.end() != it; ++it) delete it->second;
-
-        std::cout<<"Interpreter result: "<<result<<std::endl;
+        Switch s(switchUp, switchDown);
+        s.flipUp();
+        s.flipDown();
     }
 
-    ParaWeatherData * wdata = new ParaWeatherData;
-    CurrentConditionBoard* currentB = new CurrentConditionBoard(*wdata);
-    StatisticBoard* statisticB = new StatisticBoard(*wdata);
+    {
+        using namespace wikibooks_design_patterns;
+        Evaluator sentence("w x z - +");
 
-    wdata->SensorDataChange(10.2, 28.2, 1001);
-    wdata->SensorDataChange(12, 30.12, 1003);
-    wdata->SensorDataChange(10.2, 26, 806);
-    wdata->SensorDataChange(10.3, 35.9, 900);
+        static
+                const int sequences[][3] = {
+            {5, 10, 42}, {1, 3, 2}, {7, 9, -5},
+        };
 
-    wdata->removeOb(currentB);
+        for (size_t i = 0; sizeof(sequences)/sizeof(sequences[0]) > i; ++i) {
+            Map variables;
+            variables["w"] = new Number(sequences[i][0]);
+            variables["x"] = new Number(sequences[i][1]);
+            variables["z"] = new Number(sequences[i][2]);
+            int result = sentence.interpret(variables);
+            for (Map::iterator it = variables.begin(); variables.end() != it; ++it) delete it->second;
 
-    wdata->SensorDataChange(100, 40, 1900);
+            std::cout<<"Interpreter result: "<<result<<std::endl;
+        }
 
-    delete statisticB;
-    delete currentB;
-    delete wdata;
+        ParaWeatherData * wdata = new ParaWeatherData;
+        CurrentConditionBoard* currentB = new CurrentConditionBoard(*wdata);
+        StatisticBoard* statisticB = new StatisticBoard(*wdata);
 
-    Model model("Model");
-    View view(model);
-    // register the data-change event
-    model.RegisterDataChangeHandler(&DataChange);
-    // binds model and view.
-    Controller controller(model, view);
-    // when application starts or button is clicked or form is shown...
-    controller.OnLoad();
-    model.SetData("Changes"); // this should trigger View to render
+        wdata->SensorDataChange(10.2, 28.2, 1001);
+        wdata->SensorDataChange(12, 30.12, 1003);
+        wdata->SensorDataChange(10.2, 26, 806);
+        wdata->SensorDataChange(10.3, 35.9, 900);
 
-    // Declare and Initialize the constructor
-    Overload d1(8, 9);
-    // Use (-) unary operator by single operand
-    -d1;
-    +d1;
+        wdata->removeOb(currentB);
 
-    try {
-        throw MyException();
-    } catch(MyException& e) {
-        std::cout << "MyException caught" << std::endl;
-        std::cout << e.what() << std::endl;
-    } catch(std::exception& e) {
-        //Other errors
+        wdata->SensorDataChange(100, 40, 1900);
+
+        delete statisticB;
+        delete currentB;
+        delete wdata;
     }
 
-    int x = 50;
-    int y = 0;
-    double z = 0;
-
-    try {
-        z = division(x, y);
-        cout << z << endl;
-    } catch (const char* msg) {
-        cerr << msg << endl;
+    {
+        Model model("Model");
+        View view(model);
+        // register the data-change event
+        model.RegisterDataChangeHandler(&DataChange);
+        // binds model and view.
+        Controller controller(model, view);
+        // when application starts or button is clicked or form is shown...
+        controller.OnLoad();
+        model.SetData("Changes"); // this should trigger View to render
     }
 
-    int var = 23;
-    int* ptr_to_var = &var;
+    {
+        try {
+            throw MyException();
+        } catch(MyException& e) {
+            std::cout << "MyException caught" << std::endl;
+            std::cout << e.what() << std::endl;
+        } catch(std::exception& e) {
+            //Other errors
+        }
 
-    cout << "Passing a copy of the pointer to function" << endl;
-    cout << "Before :" << *ptr_to_var << endl; // display 23
-    changePointerValue(ptr_to_var);
-    cout << "After :" << *ptr_to_var << endl; // display 23
+        int x = 50;
+        int y = 0;
+        double z = 0;
 
-    var = 23;
-    ptr_to_var = &var;
-    cout << "Passing the address of the pointer to function" << endl;
-    cout << "Before :" << *ptr_to_var << endl; // display 23
-    changePointerValue(&ptr_to_var);
-    cout << "After :" << *ptr_to_var << endl; // display 42
+        try {
+            z = division(x, y);
+            cout << z << endl;
+        } catch (const char* msg) {
+            cerr << msg << endl;
+        }
+    }
 
-    var = 23;
-    ptr_to_var = &var;
-    cout << "Passing Pointer to function:" << endl;
-    cout << "Before : " << var << endl;  // display 23
-    changePointerValue(&var);
-    cout << "After : " << var << endl; // display 42
+    {
+        cout << 132 % 3 << endl; // Modulus, remaining
 
-    var = 23;
-    ptr_to_var = &var;
-    cout << "Passing a Reference to a pointer to function" << endl;
-    cout << "Before :" << *ptr_to_var << endl; // display 23
-    changeReferenceValue(ptr_to_var);
-    cout << "After :" << *ptr_to_var << endl; // display 42
+        OverloadOperator t;
+        *t;
+        t.Display();
 
-    var = 23;
-    ptr_to_var = &var;
-    cout << "Passing a Reference to a pointer to function" << endl;
-    cout << "Before :" <<  var << endl; // display 23
-    changeReferenceValue(var);
-    cout << "After :" << var << endl; // display 42
+        cout << (10 << 3) << endl; // multiply by 3 power of 2 --> 10 * 2 ^ 3 = 80
+        cout << (10 >> 1) << endl; // divide by 1 power of 2 --> 10 / 2 ^ 1 = 5
 
-    var = 23;
-    ptr_to_var = &var;
-    cout << "Return a pointer from a function " << endl;
-    cout << "Before :" << *ptr_to_var << endl; // display 23
-    ptr_to_var = returnPointerValue();
-    cout << "After :" << *ptr_to_var << endl; // display 42
+        std::cout << "power: "  << endl << power(2,3) << endl  << power(2.1, 3) << endl;
 
-    var = 23;
-    ptr_to_var = &var;
-    cout << "Returing a Reference " << endl;
-    cout << "Before :" << *ptr_to_var << endl; // display 23
-    ptr_to_var = &ReturnReference();
-    cout << "After :" << *ptr_to_var << endl; // display 42*/
+        dayOfWeek d  = SN;
+        cout << d << endl;
+        cout << dayOfWeek(SN) << endl;
 
+        cout << getDay(dayOfWeek(4)) << endl;
+
+    }
+
+    {
+        auto lambda = []( int b ){ int r=1; while (b>0) r*=b--; return r; }(5); // 5!
+
+        auto algorithm = [&]( double x, double m, double b ) -> double
+        {
+            return (m+x)/b;
+        };
+
+        auto a1 = algorithm(11,32,3.2), b1 = algorithm(41,55,6.1);
+        cout << a1 << " " << b1 << " " << lambda << endl;
+
+        auto lambda1 = [&](auto x, auto y)->double{return x / y;};
+        cout << lambda1(50.0,6.0) << endl;
+
+    }
+
+    {
+        //chainofresponsibility
+        Handler *h1 = new SpecialHandler(10, 1);
+        Handler *h2 = new SpecialHandler(20, 2);
+        Handler *h3 = new SpecialHandler(30, 3);
+
+        h1->setNextHandler(h2);
+        h2->setNextHandler(h3);
+
+        h1->request(18);
+
+        h1->request(40);
+
+        delete h1;
+        delete h2;
+        delete h3;
+    }
+
+    {
+        int nr1 = 5, nr2 = 7;
+        int &nickname = nr1;
+        nickname = nr2;
+        cout << nickname << endl;
+        //you can not change the reference of reference variable
+        //&nickname = nr2;
+
+        int var1 = 5;
+        int var2 = 5;
+        int * const p1 = &var1;
+        const int * p2 = &var1; // this pointer can not change the value that is under adress its pointing to.
+        const int * const p3 = &var1; // this pointer can not change the value that is under adress its pointing to,
+        //also it can not change the adress
+        p2 = &var2;
+        //p3 = &var2; //error
+    }
+
+    {
+        double array[6] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+        vector<double> vect = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+        cout << Average(array, 6) << endl;
+        cout << GetMaxValue(array, 6) << endl;
+        cout << Average(vect, 6) << endl;
+        cout << *(array + 1) << endl; // array is pointer. result 2
+    }
+
+    {
+        cout << new int << endl; // after compile it reserve memory, and after every run the adress changes.
+
+        int *p = new int;
+        *p = 50;
+        cout << *p << endl << p << endl;
+        delete p; //releasing the adress in memory, not deleting
+        p = nullptr;
+
+        if(p)
+            cout << *p << endl << p << endl;
+    }
+
+    {
+        double *p = new (nothrow) double[6];
+        if(p)
+        {
+            cout << p << endl;
+            for(int i = 0; i < 6; i++)
+                p[i] = static_cast<double>(i + 1);
+
+            cout << *p << endl; // 1
+            cout << *++p << endl; // 2
+            cout << *++p << endl; // 3
+            cout << *p++ << endl; // 3
+            cout << *p << endl; // 4
+            cout << *++p << endl; // 5
+            cout << *--p << endl; // 4
+        }
+
+        delete []p;
+    }
+
+    {
+
+        int var = 23;
+        int* ptr_to_var = &var;
+
+        cout << "Passing a copy of the pointer to function" << endl;
+        cout << "Before :" << *ptr_to_var << endl; // display 23
+        changePointerValue(ptr_to_var);
+        cout << "After :" << *ptr_to_var << endl; // display 23
+
+        var = 23;
+        ptr_to_var = &var;
+        cout << "Passing the address of the pointer to function" << endl;
+        cout << "Before :" << *ptr_to_var << endl; // display 23
+        changePointerValue(&ptr_to_var);
+        cout << "After :" << *ptr_to_var << endl; // display 42
+
+        var = 23;
+        ptr_to_var = &var;
+        cout << "Passing a Reference to a pointer to function" << endl;
+        cout << "Before :" << *ptr_to_var << endl; // display 23
+        changeReferenceValue(ptr_to_var);
+        cout << "After :" << *ptr_to_var << endl; // display 42
+
+        var = 23;
+        cout << "Passing a Reference to a pointer to function" << endl;
+        cout << "Before :" <<  var << endl; // display 23
+        changeReferenceValue(var);
+        cout << "After :" << var << endl; // display 42
+    }
+
+    {
+        int a = 10;
+        multiplyBy(&a, 5);
+        cout << a << endl;
+    }
+
+    {
+        int array[10];
+        int lenght_of_array = sizeof (array) / sizeof (int);
+
+        for (int i=0; i < lenght_of_array; i++)
+        {
+            array[i] = i;
+            cout << array[i] << endl;
+        }
+
+        multiplyArrayBy(array, 5, lenght_of_array);
+        //same
+        //multiplyArrayBy(&array[0], 5, lenght_of_array);
+
+        for (int i=0; i < lenght_of_array; i++)
+        {
+            cout << array[i] << endl;
+        }
+    }
+
+    {
+        cout << time(nullptr) << endl; // how many seconds gone from..
+        srand(time(nullptr)); // seeds everytime will create different numbers
+
+        //pseudo random is always following some rules
+        int nr = rand() % 10; // generate numbers between 0-9 can get same number.
+        cout << nr << endl;
+    }
+    */
 
     return 0;
 }

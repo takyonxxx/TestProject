@@ -2,6 +2,7 @@
 #define LIBRARIES_H
 
 #include <iostream>
+#include <stdlib.h>
 #include <algorithm>
 #include <string>
 #include <map>
