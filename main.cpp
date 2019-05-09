@@ -291,6 +291,9 @@ int main()
     }
 
     {
+        //Dynamic allocation of memory allows you to reserve(allocate) memory after compilation of your program.
+        //It also allows you to delete allocated memory which will free resources.
+
         cout << new int << endl; // after compile it reserve memory, and after every run the adress changes.
 
         int *p = new int;
@@ -388,7 +391,33 @@ int main()
         int nr = rand() % 10; // generate numbers between 0-9 can get same number.
         cout << nr << endl;
     }
-    */
+
+    {
+        int a = 5;
+        int b = 7;
+        cout << (double)a / b << endl; // implicit way of casting
+        cout << static_cast<int>(a /b) << endl; //explicit way of casting
+
+        char ch = 'k';
+        cout << static_cast<int>(ch) << endl; //explicit way of casting value = 107
+
+    }
+
+    {
+        //There is always invisible character called ending character and it looks like that: '/0'.
+        //When that character is met it is a signal to stop printing characters.
+        //That character '/0' is added automatically at the end when you use quotes between a word like that "hamburgers".
+        //You can add it manually too. Check it out by for example doing something like that:
+        char my_array[ ] =  "ham\0burgers";
+        char  *p = my_array;
+        cout << p << endl; // output is 'ham'
+    }
+
+    {
+        int a[3];
+        if(a == &a[0])
+        cout << a << endl << &a[0] << endl;
+    }*/
 
     return 0;
 }
