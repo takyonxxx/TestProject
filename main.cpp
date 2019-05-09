@@ -1,3 +1,16 @@
+/*
+Preprocessor Directives:
+
+Macro	Syntax: #define
+This macro defines constant value and can be any of the basic data types.
+Header file inclusion	Syntax: #include <file_name>
+The source code of the file “file_name” is included in the main program at the specified place.
+Conditional compilation	Syntax: #ifdef, #endif, #if, #else, #ifndef
+Set of commands are included or excluded in source program before compilation with respect to the condition.
+Other directives	Syntax: #undef, #pragma
+#undef is used to undefine a defined macro variable. #Pragma is used to call a function before and after main function in a C program.
+*/
+
 #include "racingexample.h"
 #include "singleton.h"
 #include "chainofresponsibility.h"
@@ -19,6 +32,10 @@
 #include "common.h"
 
 
+void showHelp()
+{
+    cout << "This is help function." << endl;
+}
 
 void DataChange(string data) {
     cout << "Data Changes: " << data <<endl;
@@ -58,9 +75,16 @@ void printTypes()
     cout << endl;
 }
 
-
-int main()
+//int argc is how many paremeters sended
+//char *argv[] is arguments values
+int main(int argc, char *argv[])
 {
+    for(int i = 0;  i < argc; i++)
+    {
+        cout << "parameter " << i << " is: " <<  argv[i] << endl;
+        if(strcmp(argv[i], "-h") == 0 && i == 1) showHelp();
+    }
+
     {
         std::cout << "Current C++ version is: ";
         if (__cplusplus == 201703L) std::cout << "C++17\n";
@@ -404,6 +428,12 @@ int main()
     }
 
     {
+        int a[3];
+        if(a == &a[0])
+        cout << a << endl << &a[0] << endl;
+    }
+
+    {
         //There is always invisible character called ending character and it looks like that: '/0'.
         //When that character is met it is a signal to stop printing characters.
         //That character '/0' is added automatically at the end when you use quotes between a word like that "hamburgers".
@@ -411,13 +441,23 @@ int main()
         char my_array[ ] =  "ham\0burgers";
         char  *p = my_array;
         cout << p << endl; // output is 'ham'
-    }
 
-    {
-        int a[3];
-        if(a == &a[0])
-        cout << a << endl << &a[0] << endl;
+        char a[] = {'a', 'b', 'c', '\0'};
+        cout << a << endl;
+
+        char x[] = "a"; //name of array is a pointer
+        char y[] = "a";
+
+        cout << (x==y) << endl;
+        cout << (&x[0] == &y[0]) << endl;
+
+        cout << (strcmp(x, y)) << endl;
+        //0 -variable are the same
+        //1 -first string is greater
+        //-1 -first string is lower
+
     }*/
+
 
     return 0;
 }
