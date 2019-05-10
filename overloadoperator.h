@@ -33,4 +33,27 @@ class OverloadOperator
        void Display() { cout<<"Overloaded Count: "<< count << endl; }
 };
 
+class Integer
+{
+    int nr;
+public:
+    Integer(){};
+    Integer(int nr){this->nr = nr;};
+    int getNr() {return nr;};
+    operator int()
+    {
+        return this->nr;
+    }
+    int operator+=(Integer o)
+    {
+        this->nr = this->nr + o.getNr();
+        return this->nr;
+    }
+    int operator-=(Integer o)
+    {
+        this->nr = this->nr - o.getNr();
+        return this->nr;
+    }
+};
+
 #endif // OVERLOADOPERATOR_H

@@ -36,6 +36,8 @@ A class has all members private by default. A struct is a class where members ar
 #include "enumaration.h"
 #include "template.h"
 #include "testclass.h"
+#include "inheritance.h"
+#include "polymorphism.h"
 
 //MVC Model-View-Controller
 #include "view.h"
@@ -52,6 +54,19 @@ void multiplyArrayBy(int *array, int amount, int size);
 void printTypes();
 //friend function defined in TestClass
 void setX(TestClass &, int);
+//polymorphism
+void voiceOfAnimal(Animal *);
+void voiceOfAnimal(Animal &);
+
+template<>
+Point2D Add(Point2D var1, Point2D var2)
+{
+    Point2D tmp;
+    tmp.setX(var1.getX() + var2.getX());
+    tmp.setY(var1.getY() + var2.getY());
+
+    return tmp;
+}
 
 //int argc is how many paremeters sended
 //char *argv[] is arguments values
@@ -434,7 +449,7 @@ int main(int argc, char *argv[])
         delete h1;
         delete h2;
         delete h3;
-    }*/
+    }
 
     {
         TestClass dog(10, 50, 100);
@@ -461,7 +476,85 @@ int main(int argc, char *argv[])
         cout << "p: " << *(house.p) << endl;
     }
 
+    {
+        //overloading operators
+        Integer a(50);
+        int b = static_cast<int>(a);
+        a = 100;
+        cout << a.getNr() << endl;
+        cout << b << endl;
+        a += b;
+        cout << a.getNr() << endl;
+        a -= b;
+        cout << a.getNr() << endl;
+    }
+
+    //inheritance
+    {
+        Point2D p2(10, 67);
+        //p2.setXY(5, 50);
+        p2.setX(47);
+        p2.Point::setX(47);
+        cout << p2.getX() << endl;
+        cout << p2.getY() << endl;
+    }
+
+    //polymorphism, virtual functions, abstract class
+    //polymorphism means : our complier knows which of morphs could invoke,
+    //Another word the condition of occurring in several different forms.
+    {
+        Dog dog;
+        Cat cat;
+        Cow cow;
+
+        cout <<  animal.getVoice() << endl;
+        cout <<  dog.getVoice() << endl;
+        cout <<  cat.getVoice() << endl;
+        cout <<  cow.getVoice() << endl;
+
+        Animal *d = &dog;
+        voiceOfAnimal(d);
+        voiceOfAnimal(&cat);
+        voiceOfAnimal(cow);
+
+        //Animal *dog = new Dog;
+        //delete dog;// virtual ~Animal() invoked here
+    }
+
+    //function templates generalization
+    {
+        cout << Add<double, double>(2, 5.2) << endl;
+
+        Point2D p1(10, 67);
+        Point2D p2(50, 3);
+
+        Point2D sum = Add(p1, p2); // templates way
+        cout << sum.getX() << " " << sum.getY() << endl;
+
+        Point2D sum2 = p1 + p2; // overloading operation way
+        cout << sum2.getX() << " " << sum2.getY() << endl;
+    }*/
+
+    //class templates generalization
+    {
+        //typedefination
+        templateClassChild_Int t(5);
+        cout << t.getValue() << endl;
+
+        templateClassChild_Double td(5.5);
+        cout << td.getValue() << endl;
+    }
     return 0;
+}
+
+void voiceOfAnimal(Animal *p) //faster
+{
+    cout << p->getVoice() << endl;
+}
+
+void voiceOfAnimal(Animal &p)
+{
+    cout << p.getVoice() << endl;
 }
 
 //friend function defined in TestClass

@@ -14,6 +14,7 @@ HEADERS += \
     controller.h \
     enumaration.h \
     exceptions.h \
+    inheritance.h \
     interpreter.h \
     iterator.h \
     libraries.h \
@@ -21,6 +22,7 @@ HEADERS += \
     overloadfunction.h \
     overloadoperator.h \
     passvalue.h \
+    polymorphism.h \
     racingexample.h \
     singleton.h \
     template.h \
