@@ -38,6 +38,9 @@ A class has all members private by default. A struct is a class where members ar
 #include "testclass.h"
 #include "inheritance.h"
 #include "polymorphism.h"
+#include "namespace.h"
+#include "stream.h"
+#include "database.h"
 
 //MVC Model-View-Controller
 #include "view.h"
@@ -202,28 +205,6 @@ int main(int argc, char *argv[])
         // when application starts or button is clicked or form is shown...
         controller.OnLoad();
         model.SetData("Changes"); // this should trigger View to render
-    }
-
-    {
-        try {
-            throw MyException();
-        } catch(MyException& e) {
-            std::cout << "MyException caught" << std::endl;
-            std::cout << e.what() << std::endl;
-        } catch(std::exception& e) {
-            //Other errors
-        }
-
-        int x = 50;
-        int y = 0;
-        double z = 0;
-
-        try {
-            z = division(x, y);
-            cout << z << endl;
-        } catch (const char* msg) {
-            cerr << msg << endl;
-        }
     }
 
     {
@@ -533,7 +514,7 @@ int main(int argc, char *argv[])
 
         Point2D sum2 = p1 + p2; // overloading operation way
         cout << sum2.getX() << " " << sum2.getY() << endl;
-    }*/
+    }
 
     //class templates generalization
     {
@@ -543,7 +524,93 @@ int main(int argc, char *argv[])
 
         templateClassChild_Double td(5.5);
         cout << td.getValue() << endl;
+
+        //specialize the functions
+        TemplateClass<char> b(49);
+        TemplateClass<double> c(49.5);
+        auto value = c.getValue();
+        //specialized class
+        TemplateClass<int*> i(49);
     }
+
+    //Exceptions
+    {
+        try {
+            throw MyException();
+        } catch(MyException& e) {
+            std::cout << "MyException caught" << std::endl;
+            std::cout << e.what() << std::endl;
+        } catch(std::exception& e) {
+            //Other errors
+        }
+
+        int x = 50;
+        int y = 0;
+        double z = 0;
+
+        try {
+            z = division(x, y);
+            cout << z << endl;
+        } catch (const char* msg) {
+            cerr << msg << endl;
+        }
+
+        int a = 5;
+        try {
+            a *=10;
+
+            if(a == 50)
+                throw a;
+
+            cout << "Here are other instructions" << endl;
+
+        } catch (int e) {
+            cout << "A cannot be equal to " << a << endl;
+        }catch(double e){
+            cout << "A cannot be equal to " << a << endl;
+        }
+        catch(...){
+            cout << "other catches" << endl;
+        }
+    }
+
+    //namespaces
+    {
+        cout << "this is text: " << mySpace::endl ;
+
+    }
+
+    //stream
+    {
+        writeFile();
+        openFile();
+    }
+
+    //peek, putback
+    {
+        char c = cin.peek();
+        //char c = cin.get();
+        //cin.putback(c);
+
+        if(c > '0' && c < '9')
+        {
+            int number;
+            cin >> number;
+            cout << "Number is: " << number << endl;
+        }
+        else {
+            string text;
+            cin >> text;
+            cout << "Text is: " << text << endl;
+        }
+    }*/
+
+    //database
+    {
+        databaseMenu();
+
+    }
+
     return 0;
 }
 

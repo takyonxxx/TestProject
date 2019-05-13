@@ -12,6 +12,7 @@ HEADERS += \
     command.h \
     common.h \
     controller.h \
+    database.h \
     enumaration.h \
     exceptions.h \
     inheritance.h \
@@ -19,12 +20,14 @@ HEADERS += \
     iterator.h \
     libraries.h \
     model.h \
+    namespace.h \
     overloadfunction.h \
     overloadoperator.h \
     passvalue.h \
     polymorphism.h \
     racingexample.h \
     singleton.h \
+    stream.h \
     template.h \
     testclass.h \
     view.h

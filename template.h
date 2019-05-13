@@ -55,7 +55,7 @@ protected:
 public:
     TemplateClass(T = 0);
     virtual  ~TemplateClass();
-    virtual T getValue() = 0; // abstract class
+    virtual T getValue();
 };
 
 template <typename T>
@@ -67,6 +67,20 @@ TemplateClass<T>::TemplateClass(T value)
 template <typename T>
 TemplateClass<T>::~TemplateClass()
 {
+}
+
+template <typename T>
+T TemplateClass<T>::getValue()
+{
+    return this->value;
+}
+
+ //specialize the function
+template <>
+double TemplateClass<double>::getValue()
+{
+    cout << "this will be executed only when TemplateClass<double>" << endl;
+    return this->value;
 }
 
 //type defination
@@ -102,5 +116,24 @@ TemplateClassChild<T>::~TemplateClassChild()
 //type defination
 typedef TemplateClassChild<int> templateClassChild_Int;
 typedef TemplateClassChild<double> templateClassChild_Double;
+
+
+//specialize the class
+template<typename K>
+class TemplateClass<K*>
+{
+public:
+    TemplateClass(K a=0)
+    {
+        cout << "you can't use pointers here" << endl;
+    }
+};
+
+template <>
+class TemplateClass<char>
+{
+public:
+    TemplateClass(char a = 0){cout << "this is from TemplateClass<char>" << endl;};
+};
 
 #endif // TEMPLATE_H
