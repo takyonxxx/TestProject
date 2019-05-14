@@ -91,11 +91,12 @@ int main(int argc, char *argv[])
         else std::cout << "pre-standard C++\n";
     }
 
+    /*
+
     //cout << 132 % 3 << endl; // Modulus, remaining
 
     //Access Modifiers
-    /*{
-
+    {
         //public
         Circle_Public obj;
         // accessing public datamember outside class
@@ -157,6 +158,7 @@ int main(int argc, char *argv[])
         cout << "Encapsulation: get() " << obj.get() << endl;
     }
 
+    //io
     {
         char cont = {};
         do
@@ -414,7 +416,7 @@ int main(int argc, char *argv[])
         processPhoto(*p);
     }
 
-    //Constructure
+    //Constructure, friend function
     {
         Object dog(10, 50, 100);
         Object copyOfDog = dog; // copy constructure;
@@ -430,6 +432,7 @@ int main(int argc, char *argv[])
         cout << "p: " << *(copyOfDog.p) << endl;
 
         dog.setPosition(50, 100);
+        //friend function
         setX(dog, 444);
         cout << "New Dog position:" << endl;
         dog.getPosition();
@@ -600,9 +603,9 @@ int main(int argc, char *argv[])
         }
 
         cout << "Still running" << endl;
-    }*/
+    }
 
-
+    */
 
 
     requireEnter();
