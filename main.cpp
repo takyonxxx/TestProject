@@ -43,6 +43,8 @@ A class has all members private by default. A struct is a class where members ar
 #include "stream.h"
 #include "database.h"
 #include "algorithm.h"
+#include "pragmadirective.h"
+#include "casting.h"
 
 //MVC Model-View-Controller
 #include "view.h"
@@ -588,7 +590,7 @@ int main(int argc, char *argv[])
             //Other errors
         }
 
-        //cath order paren child classes, bad_alloc is child of exception
+        //cath order parent child classes, bad_alloc is child of exception
         try
         {
             goesWrong();
@@ -605,8 +607,29 @@ int main(int argc, char *argv[])
         cout << "Still running" << endl;
     }
 
+    //pragma Directive
+    {
+        pragmaTest();
+    }
+
+    //Binary file
+    {
+        writeBinary();
+        readBinary();
+    }
     */
 
+    //Casting
+    {
+        reinterpret_cast_test();
+        cout << endl;
+        static_cast_test();
+        cout << endl;
+        dynamic_cast_test();
+        cout << endl;
+        const int myConst = 5;
+        int *nonConst = const_cast<int*>(&myConst); // removes const
+    }
 
     requireEnter();
 

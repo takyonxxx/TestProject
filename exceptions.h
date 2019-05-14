@@ -43,7 +43,7 @@ struct MyException : public exception
 {
 
 public:
-  virtual const char * what () const {
+  virtual const char * what () const throw(){
       return "Something went wrong";
    }
 };

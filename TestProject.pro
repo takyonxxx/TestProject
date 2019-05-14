@@ -12,6 +12,7 @@ SOURCES += \
 HEADERS += \
     accessmodifiers.h \
     algorithm.h \
+    casting.h \
     chainofresponsibility.h \
     common.h \
     controller.h \
@@ -29,6 +30,7 @@ HEADERS += \
     overloadoperator.h \
     passvalue.h \
     polymorphism.h \
+    pragmadirective.h \
     racingexample.h \
     singleton.h \
     stream.h \

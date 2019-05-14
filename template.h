@@ -34,17 +34,6 @@ T GetMaxValue(T* atArray, int size)
     return tMax;
 }
 
-template<typename T>
-T Average( std::vector<T> const& vec , int nNumValues)
-{
-    T tSum = 0;
-    for (int nCount=0; nCount < nNumValues; nCount++)
-        tSum += vec[nCount];
-
-    tSum /= nNumValues;
-    return tSum;
-}
-
 //class templates generalization
 
 template <typename T>

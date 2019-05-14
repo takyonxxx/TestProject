@@ -6,7 +6,7 @@
 
 struct Person
 {
-    string name;
+    string name; // allocate memory from heap its pointer
     string surname;
     short age;
     string telephone;
@@ -168,7 +168,7 @@ void showPeople()
 
 void databaseMenu()
 {
-    char test;
+    char test;   
 
     loadPeopleFromFile();
 

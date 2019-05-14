@@ -4,7 +4,8 @@
 #include <iostream>
 #include <stdlib.h>
 #include <algorithm>
-#include <string>
+#include <stdio.h>
+#include <string.h>
 #include <map>
 #include <list>
 #include<thread>

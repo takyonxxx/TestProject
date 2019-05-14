@@ -7,6 +7,16 @@
 //put in from keyboard - source
 //put out to file - destination
 
+#pragma pack(push, 1) // exact fit - no padding, size 62
+struct PersonObj
+{
+    char name[50];
+    int age;
+    double height;
+};
+#pragma pack(pop) //back to whatever the previous packing mode was
+
+
 auto sizeOfFile(fstream *file)
 {
     file->seekg(0, ios::end);
@@ -67,6 +77,39 @@ void writeFile()
     file.close();
 }
 
+void writeBinary()
+{
+    PersonObj person = {"Turkay Biliyor", 45, 1.82};
+    ofstream file;
+    file.open("sample_binary.txt", ios::binary); // create file
+    if(file.is_open())
+    {
+        file.write(reinterpret_cast<char*>(&person), sizeof (PersonObj));
+        file.close();
+    }
+    else {
+        cout << "The binary file hasn't been opened properly" << endl;
+    }
+    file.close();
+}
+
+void readBinary()
+{
+    PersonObj person = {};
+    ifstream file;
+    file.open("sample_binary.txt", ios::binary); // create file
+    if(file.is_open())
+    {
+        file.read(reinterpret_cast<char*>(&person), sizeof (PersonObj));
+        file.close();
+    }
+    else {
+        cout << "The binary file hasn't been opened properly" << endl;
+    }
+
+    cout << person.name << ", " << person.age << ", " << person.height << endl;
+    file.close();
+}
 
 void openFile()
 {
