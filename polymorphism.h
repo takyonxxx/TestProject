@@ -3,6 +3,23 @@
 #include "libraries.h"
 //polymorphism, virtual functions, abstract class
 
+/*
+The word polymorphism means having many forms.
+In simple words, we can define polymorphism as the ability of a message to be displayed in more than one form.
+Real life example of polymorphism, a person at a same time can have different characteristic.
+Like a man at a same time is a father, a husband, a employee.
+So a same person posses have different behavior in different situations. This is called polymorphism.
+Polymorphism is considered as one of the important features of Object Oriented Programming.
+
+In C++ polymorphism is mainly divided into two types:
+Compile time Polymorphism
+Runtime Polymorphism
+Compile time polymorphism: This type of polymorphism is achieved by function overloading or operator overloading.
+
+Runtime polymorphism: This type of polymorphism is achieved by Function Overriding.
+*/
+
+
 class Animal
 {
 protected:

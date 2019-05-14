@@ -41,6 +41,7 @@ A class has all members private by default. A struct is a class where members ar
 #include "namespace.h"
 #include "stream.h"
 #include "database.h"
+#include "algorithm.h"
 
 //MVC Model-View-Controller
 #include "view.h"
@@ -603,12 +604,17 @@ int main(int argc, char *argv[])
             cin >> text;
             cout << "Text is: " << text << endl;
         }
-    }*/
+    }
 
     //database
     {
         databaseMenu();
+    }
+    */
 
+    //algorithm
+    {
+        algorithmTest();
     }
 
     return 0;

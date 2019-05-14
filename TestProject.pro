@@ -8,6 +8,7 @@ SOURCES += \
         testclass.cpp
 
 HEADERS += \
+    algorithm.h \
     chainofresponsibility.h \
     command.h \
     common.h \
