@@ -22,12 +22,11 @@ whereas Structure does not support the inheritance.
 A class has all members private by default. A struct is a class where members are public by default.
 */
 
+#include "accessmodifiers.h"
 #include "racingexample.h"
 #include "singleton.h"
 #include "chainofresponsibility.h"
-#include "command.h"
-#include "interpreter.h"
-#include "iterator.h"
+#include "interface.h"
 #include "overloadfunction.h"
 #include "exceptions.h"
 #include "passvalue.h"
@@ -38,7 +37,9 @@ A class has all members private by default. A struct is a class where members ar
 #include "testclass.h"
 #include "inheritance.h"
 #include "polymorphism.h"
+#include "encapsulation.h"
 #include "namespace.h"
+#include "lambda.h"
 #include "stream.h"
 #include "database.h"
 #include "algorithm.h"
@@ -57,7 +58,7 @@ void multiplyBy(int *var, int amount);
 void multiplyArrayBy(int *array, int amount, int size);
 void printTypes();
 //friend function defined in TestClass
-void setX(TestClass &, int);
+void setX(Object &, int);
 //polymorphism
 void voiceOfAnimal(Animal *);
 void voiceOfAnimal(Animal &);
@@ -71,7 +72,6 @@ Point2D Add(Point2D var1, Point2D var2)
 
     return tmp;
 }
-
 //int argc is how many paremeters sended
 //char *argv[] is arguments values
 int main(int argc, char *argv[])
@@ -91,7 +91,73 @@ int main(int argc, char *argv[])
         else std::cout << "pre-standard C++\n";
     }
 
+    //cout << 132 % 3 << endl; // Modulus, remaining
+
+    //Access Modifiers
     /*{
+
+        //public
+        Circle_Public obj;
+        // accessing public datamember outside class
+        obj.radius = 5.5;
+
+        cout << "Radius is:" << obj.radius << "\n";
+        cout << "Area is:" << obj.compute_area() << endl;
+
+        //private
+        // creating object of the class
+        Circle_Private obj2;
+        // trying to access private data member
+        // directly outside the class
+        obj2.compute_area(1.5);
+
+        //protected
+        Child obj3;
+
+        // member function of the derived class can
+        // access the protected data members of the base class
+
+        obj3.setId(81);
+        obj3.displayId();
+    }
+
+    //inheritance
+    {
+        Point2D p2(10, 67);
+        //p2.setXY(5, 50);
+        p2.setX(47);
+        p2.Point::setX(47);
+        cout << p2.getX() << endl;
+        cout << p2.getY() << endl;
+    }
+
+    //polymorphism, virtual functions, abstract class
+    {
+        Dog dog;
+        Cat cat;
+        Cow cow;
+
+        cout <<  dog.getVoice() << endl;
+        cout <<  cat.getVoice() << endl;
+        cout <<  cow.getVoice() << endl;
+
+        Animal *d = &dog;
+        voiceOfAnimal(d);
+        voiceOfAnimal(&cat);
+        voiceOfAnimal(cow);
+
+        //Animal *dog = new Dog;
+        //delete dog;// virtual ~Animal() invoked here
+    }
+
+    //encapsulation
+    {
+        Encapsulation obj;
+        obj.set(5);
+        cout << "Encapsulation: get() " << obj.get() << endl;
+    }
+
+    {
         char cont = {};
         do
         {
@@ -106,31 +172,7 @@ int main(int argc, char *argv[])
         }while(cont != 'n' && cont != 'N');
     }
 
-
-    {
-        char a;   //character 1 byte -128 to 127
-        int b;    //integer 4 bytes -2147483648 to 2147483647
-        short c;  //short integer 2 bytes -32768 to 32768
-        float d;  //floating point 4 bytes +/- 3.4e +/- 38 (~7 digits)
-        double f; //double floating point 8 bytes +/- 1.7e +/- 308 (~15 digits)
-        unsigned g; // integer 2 bytes 0 to 65535
-
-        for(int i = 1; i <= 10; i++)
-        {
-            if(i == 5)continue;
-
-            for(int j = 1; j <= 10; j++)
-            {
-                cout.width(4);
-                cout << i * j;
-            }
-            cout << endl;
-        }
-
-        int biArray[3][4] = {};
-        cout << biArray[0][0] << endl;
-    }
-
+    //RacingExample
     {
         RacingExample EO;
         bool(RacingExample::*func_pointer1)();
@@ -145,6 +187,7 @@ int main(int argc, char *argv[])
         thread_two.join();
     }
 
+    //Singleton, interface
     {
         Singleton* singleton = Singleton::GetInstance();
         cout << "The value of the singleton: " << singleton->a << endl;
@@ -158,44 +201,7 @@ int main(int argc, char *argv[])
         s.flipDown();
     }
 
-    {
-        using namespace wikibooks_design_patterns;
-        Evaluator sentence("w x z - +");
-
-        static
-                const int sequences[][3] = {
-            {5, 10, 42}, {1, 3, 2}, {7, 9, -5},
-        };
-
-        for (size_t i = 0; sizeof(sequences)/sizeof(sequences[0]) > i; ++i) {
-            Map variables;
-            variables["w"] = new Number(sequences[i][0]);
-            variables["x"] = new Number(sequences[i][1]);
-            variables["z"] = new Number(sequences[i][2]);
-            int result = sentence.interpret(variables);
-            for (Map::iterator it = variables.begin(); variables.end() != it; ++it) delete it->second;
-
-            std::cout<<"Interpreter result: "<<result<<std::endl;
-        }
-
-        ParaWeatherData * wdata = new ParaWeatherData;
-        CurrentConditionBoard* currentB = new CurrentConditionBoard(*wdata);
-        StatisticBoard* statisticB = new StatisticBoard(*wdata);
-
-        wdata->SensorDataChange(10.2, 28.2, 1001);
-        wdata->SensorDataChange(12, 30.12, 1003);
-        wdata->SensorDataChange(10.2, 26, 806);
-        wdata->SensorDataChange(10.3, 35.9, 900);
-
-        wdata->removeOb(currentB);
-
-        wdata->SensorDataChange(100, 40, 1900);
-
-        delete statisticB;
-        delete currentB;
-        delete wdata;
-    }
-
+    //Model View Controller
     {
         Model model("Model");
         View view(model);
@@ -208,9 +214,8 @@ int main(int argc, char *argv[])
         model.SetData("Changes"); // this should trigger View to render
     }
 
+    //Overloading
     {
-        cout << 132 % 3 << endl; // Modulus, remaining
-
         OverloadOperator t;
         *t;
         t.Display();
@@ -220,31 +225,31 @@ int main(int argc, char *argv[])
 
         std::cout << "power: "  << endl << power(2,3) << endl  << power(2.1, 3) << endl;
 
+        Fraction f(2, 5);
+        float val = f;
+        cout << val;
+
+        PointF p(20, 20);
+        p.print();
+        p = 30;   // Member x of t becomes 30
+        p.print();
+    }
+
+    //Enumaration
+    {
         dayOfWeek d  = SN;
         cout << d << endl;
         cout << dayOfWeek(SN) << endl;
-
         cout << getDay(dayOfWeek(4)) << endl;
-
     }
 
+    //lambda function
     {
-        auto lambda = []( int b ){ int r=1; while (b>0) r*=b--; return r; }(5); // 5!
-
-        auto algorithm = [&]( double x, double m, double b ) -> double
-        {
-            return (m+x)/b;
-        };
-
-        auto a1 = algorithm(11,32,3.2), b1 = algorithm(41,55,6.1);
-        cout << a1 << " " << b1 << " " << lambda << endl;
-
-        auto lambda1 = [&](auto x, auto y)->double{return x / y;};
-        cout << lambda1(50.0,6.0) << endl;
-
+        lambdaTest();
     }
 
-    {
+    //referance, pointer
+     {
         int nr1 = 5, nr2 = 7;
         int &nickname = nr1;
         nickname = nr2;
@@ -260,34 +265,11 @@ int main(int argc, char *argv[])
         //also it can not change the adress
         p2 = &var2;
         //p3 = &var2; //error
-    }
 
-    {
-        double array[6] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
-        vector<double> vect = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
-        cout << Average(array, 6) << endl;
-        cout << GetMaxValue(array, 6) << endl;
-        cout << Average(vect, 6) << endl;
-        cout << *(array + 1) << endl; // array is pointer. result 2
-    }
+        int a[3];
+        if(a == &a[0])
+        cout << a << endl << &a[0] << endl;
 
-    {
-        //Dynamic allocation of memory allows you to reserve(allocate) memory after compilation of your program.
-        //It also allows you to delete allocated memory which will free resources.
-
-        cout << new int << endl; // after compile it reserve memory, and after every run the adress changes.
-
-        int *p = new int;
-        *p = 50;
-        cout << *p << endl << p << endl;
-        delete p; //releasing the adress in memory, not deleting
-        p = nullptr;
-
-        if(p)
-            cout << *p << endl << p << endl;
-    }
-
-    {
         double *p = new (nothrow) double[6];
         if(p)
         {
@@ -307,6 +289,24 @@ int main(int argc, char *argv[])
         delete []p;
     }
 
+    //Dynamic allocation of memory
+    {
+        //Dynamic allocation of memory allows you to reserve(allocate) memory after compilation of your program.
+        //It also allows you to delete allocated memory which will free resources.
+
+        cout << new int << endl; // after compile it reserve memory, and after every run the adress changes.
+
+        int *p = new int;
+        *p = 50;
+        cout << *p << endl << p << endl;
+        delete p; //releasing the adress in memory, not deleting
+        p = nullptr;
+
+        if(p)
+            cout << *p << endl << p << endl;
+    }
+
+    //Passing value
     {
 
         int var = 23;
@@ -336,15 +336,11 @@ int main(int argc, char *argv[])
         cout << "Before :" <<  var << endl; // display 23
         changeReferenceValue(var);
         cout << "After :" << var << endl; // display 42
-    }
 
-    {
         int a = 10;
         multiplyBy(&a, 5);
         cout << a << endl;
-    }
 
-    {
         int array[10];
         int lenght_of_array = sizeof (array) / sizeof (int);
 
@@ -364,6 +360,7 @@ int main(int argc, char *argv[])
         }
     }
 
+    //Random numbers
     {
         cout << time(nullptr) << endl; // how many seconds gone from..
         srand(time(nullptr)); // seeds everytime will create different numbers
@@ -373,6 +370,7 @@ int main(int argc, char *argv[])
         cout << nr << endl;
     }
 
+    //Casting
     {
         int a = 5;
         int b = 7;
@@ -384,12 +382,7 @@ int main(int argc, char *argv[])
 
     }
 
-    {
-        int a[3];
-        if(a == &a[0])
-        cout << a << endl << &a[0] << endl;
-    }
-
+    //Characters, array
     {
         //There is always invisible character called ending character and it looks like that: '/0'.
         //When that character is met it is a signal to stop printing characters.
@@ -415,28 +408,17 @@ int main(int argc, char *argv[])
 
     }
 
+    //Chain of Responsibility
     {
-        //chainofresponsibility
-        Handler *h1 = new SpecialHandler(10, 1);
-        Handler *h2 = new SpecialHandler(20, 2);
-        Handler *h3 = new SpecialHandler(30, 3);
-
-        h1->setNextHandler(h2);
-        h2->setNextHandler(h3);
-
-        h1->request(18);
-        h1->request(40);
-
-
-        delete h1;
-        delete h2;
-        delete h3;
+        Photo *p = new Photo("Y2013 Photo");
+        processPhoto(*p);
     }
 
+    //Constructure
     {
-        TestClass dog(10, 50, 100);
-        TestClass copyOfDog = dog; // copy constructure;
-        const TestClass house(5, 25, 100); // House can not move setposition is not available;
+        Object dog(10, 50, 100);
+        Object copyOfDog = dog; // copy constructure;
+        const Object house(5, 25, 100); // House can not move setposition is not available;
         *(copyOfDog.p) = 700;
 
         cout << "Dog position:" << endl;
@@ -458,8 +440,8 @@ int main(int argc, char *argv[])
         cout << "p: " << *(house.p) << endl;
     }
 
+    //Overloading operators
     {
-        //overloading operators
         Integer a(50);
         int b = static_cast<int>(a);
         a = 100;
@@ -469,56 +451,31 @@ int main(int argc, char *argv[])
         cout << a.getNr() << endl;
         a -= b;
         cout << a.getNr() << endl;
-    }
 
-    //inheritance
+        Complex c1(10, 5), c2(2, 4);
+        Complex c3 = c1 + c2; // An example call to "operator+"
+        c3.print();
+    }    
+
+    //templates generalization
     {
-        Point2D p2(10, 67);
-        //p2.setXY(5, 50);
-        p2.setX(47);
-        p2.Point::setX(47);
-        cout << p2.getX() << endl;
-        cout << p2.getY() << endl;
-    }
-
-    //polymorphism, virtual functions, abstract class
-    //polymorphism means : our complier knows which of morphs could invoke,
-    //Another word the condition of occurring in several different forms.
-    {
-        Dog dog;
-        Cat cat;
-        Cow cow;
-
-        cout <<  animal.getVoice() << endl;
-        cout <<  dog.getVoice() << endl;
-        cout <<  cat.getVoice() << endl;
-        cout <<  cow.getVoice() << endl;
-
-        Animal *d = &dog;
-        voiceOfAnimal(d);
-        voiceOfAnimal(&cat);
-        voiceOfAnimal(cow);
-
-        //Animal *dog = new Dog;
-        //delete dog;// virtual ~Animal() invoked here
-    }
-
-    //function templates generalization
-    {
+        double array[6] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+        vector<double> vect = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+        cout << Average(array, 6) << endl;
+        cout << GetMaxValue(array, 6) << endl;
+        cout << Average(vect, 6) << endl;
+        cout << *(array + 1) << endl; // array is pointer. result 2
         cout << Add<double, double>(2, 5.2) << endl;
 
         Point2D p1(10, 67);
         Point2D p2(50, 3);
 
-        Point2D sum = Add(p1, p2); // templates way
+        Point2D sum = Add(p1, p2); // template way
         cout << sum.getX() << " " << sum.getY() << endl;
 
         Point2D sum2 = p1 + p2; // overloading operation way
         cout << sum2.getX() << " " << sum2.getY() << endl;
-    }
 
-    //class templates generalization
-    {
         //typedefination
         templateClassChild_Int t(5);
         cout << t.getValue() << endl;
@@ -531,54 +488,12 @@ int main(int argc, char *argv[])
         TemplateClass<double> c(49.5);
         auto value = c.getValue();
         //specialized class
-        TemplateClass<int*> i(49);
-    }
-
-    //Exceptions
-    {
-        try {
-            throw MyException();
-        } catch(MyException& e) {
-            std::cout << "MyException caught" << std::endl;
-            std::cout << e.what() << std::endl;
-        } catch(std::exception& e) {
-            //Other errors
-        }
-
-        int x = 50;
-        int y = 0;
-        double z = 0;
-
-        try {
-            z = division(x, y);
-            cout << z << endl;
-        } catch (const char* msg) {
-            cerr << msg << endl;
-        }
-
-        int a = 5;
-        try {
-            a *=10;
-
-            if(a == 50)
-                throw a;
-
-            cout << "Here are other instructions" << endl;
-
-        } catch (int e) {
-            cout << "A cannot be equal to " << a << endl;
-        }catch(double e){
-            cout << "A cannot be equal to " << a << endl;
-        }
-        catch(...){
-            cout << "other catches" << endl;
-        }
+        TemplateClass<int*> i(49);       
     }
 
     //namespaces
     {
         cout << "this is text: " << mySpace::endl ;
-
     }
 
     //stream
@@ -610,12 +525,87 @@ int main(int argc, char *argv[])
     {
         databaseMenu();
     }
-    */
 
     //algorithm
     {
         algorithmTest();
     }
+
+    //Exceptions
+    {
+        int x = 50;
+        int y = 0;
+        double z = 0;
+
+        try {
+            z = division(x, y);
+            cout << z << endl;
+        } catch (const char* msg) {
+            cerr << msg << endl;
+        }
+
+        int a = 5;
+        try {
+            a *=10;
+
+            if(a == 50)
+                throw a;
+
+            cout << "Here are other instructions" << endl;
+
+        } catch (int e) {
+            cout << "A cannot be equal to " << a << endl;
+        }catch(double e){
+            cout << "A cannot be equal to " << a << endl;
+        }
+        catch(...){
+            cout << "other catches" << endl;
+        }
+
+        try
+        {
+            CanGoWrong wrong;
+        }
+        catch (bad_alloc &e)
+        {
+             cout << "Caught Exception: " << e.what() << endl;
+        }
+
+        try
+        {
+            throw MyException();
+        }
+        catch(MyException& e)
+        {
+            std::cout << "MyException caught: ";
+            std::cout << e.what() << std::endl;
+        }
+        catch(std::exception& e)
+        {
+            //Other errors
+        }
+
+        //cath order paren child classes, bad_alloc is child of exception
+        try
+        {
+            goesWrong();
+        }
+        catch(bad_alloc &e)
+        {
+            std::cout << "Catching bad_alloc: " << e.what() << std::endl;
+        }
+        catch(exception &e)
+        {
+            std::cout << "Catching exception: " << e.what() << std::endl;
+        }
+
+        cout << "Still running" << endl;
+    }*/
+
+
+
+
+    requireEnter();
 
     return 0;
 }
@@ -634,7 +624,7 @@ void voiceOfAnimal(Animal &p)
 //A non-member function can access the private and protected members of a class if it is declared a friend of that class.
 //That is done by including a declaration of this external function within the class,
 //and preceding it with the keyword friend:
-void setX(TestClass &obj, int value)
+void setX(Object &obj, int value)
 {
     obj.x = value;
     cout << "setting x value by friend class to : " << value << endl;

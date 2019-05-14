@@ -3,22 +3,25 @@ CONFIG += console c++14
 CONFIG -= app_bundle
 CONFIG -= qt
 
+CONFIG +=  -fno-exceptions
+
 SOURCES += \
         main.cpp \
         testclass.cpp
 
 HEADERS += \
+    accessmodifiers.h \
     algorithm.h \
     chainofresponsibility.h \
-    command.h \
     common.h \
     controller.h \
     database.h \
+    encapsulation.h \
     enumaration.h \
     exceptions.h \
     inheritance.h \
-    interpreter.h \
-    iterator.h \
+    interface.h \
+    lambda.h \
     libraries.h \
     model.h \
     namespace.h \

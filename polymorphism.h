@@ -4,6 +4,8 @@
 //polymorphism, virtual functions, abstract class
 
 /*
+Polymorphism means : our complier knows which of morphs could invoke,
+Another word the condition of occurring in several different forms.
 The word polymorphism means having many forms.
 In simple words, we can define polymorphism as the ability of a message to be displayed in more than one form.
 Real life example of polymorphism, a person at a same time can have different characteristic.
@@ -15,7 +17,6 @@ In C++ polymorphism is mainly divided into two types:
 Compile time Polymorphism
 Runtime Polymorphism
 Compile time polymorphism: This type of polymorphism is achieved by function overloading or operator overloading.
-
 Runtime polymorphism: This type of polymorphism is achieved by Function Overriding.
 */
 
@@ -36,7 +37,7 @@ public:
         cout << "I am from the base class" << endl;
     }
 
-    virtual string getVoice() = 0; // we make class abstract class
+    virtual string getVoice() = 0; // we make class abstract class, // a pure virtual function
     //= 0 tells complier this is abstract class.
 };
 

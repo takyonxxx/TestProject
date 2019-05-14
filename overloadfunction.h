@@ -26,4 +26,46 @@ double power(double input, int e)
     return input;
 }
 
+class PointF
+{
+private:
+    int x, y;
+public:
+    PointF(int i = 0, int j = 0) {
+        x = i;   y = j;
+    }
+    void print() {
+        cout << endl << " x = " << x << ", y = " << y << endl;
+    }
+};
+
+class Fraction
+{
+    int num, den;
+public:
+    Fraction(int n,  int d) { num = n; den = d; }
+
+    // conversion operator: return float value of fraction
+    operator float() const {
+        return float(num) / float(den);
+    }
+};
+
+class Complex {
+private:
+    int real, imag;
+public:
+    Complex(int r = 0, int i =0)  {real = r;   imag = i;}
+
+    // This is automatically called when '+' is used with
+    // between two Complex objects
+    Complex operator + (Complex const &obj) {
+         Complex res;
+         res.real = real + obj.real;
+         res.imag = imag + obj.imag;
+         return res;
+    }
+    void print() { cout << real << " + i" << imag << endl; }
+};
+
 #endif // OVERLOAD_H

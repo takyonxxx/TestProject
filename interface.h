@@ -2,7 +2,7 @@
 #define COMMAND_H
 #include "libraries.h"
 /*the Command interface*/
-class Command
+class Interface
 {
 public:
     virtual void execute() = 0;
@@ -26,7 +26,7 @@ public:
 };
 
 /*the Command for turning on the light*/
-class FlipUpCommand: public Command
+class FlipUpCommand: public Interface
 {
 public:
 
@@ -45,7 +45,7 @@ private:
 };
 
 /*the Command for turning off the light*/
-class FlipDownCommand: public Command
+class FlipDownCommand: public Interface
 {
 public:
     FlipDownCommand(Light& light) :theLight(light)
@@ -62,7 +62,7 @@ private:
 
 class Switch {
 public:
-    Switch(Command& flipUpCmd, Command& flipDownCmd)
+    Switch(Interface& flipUpCmd, Interface& flipDownCmd)
     :flipUpCommand(flipUpCmd),flipDownCommand(flipDownCmd)
     {
 
@@ -79,8 +79,8 @@ public:
     }
 
 private:
-    Command& flipUpCommand;
-    Command& flipDownCommand;
+    Interface& flipUpCommand;
+    Interface& flipDownCommand;
 };
 
 #endif // COMMAND_H

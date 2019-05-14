@@ -1,14 +1,14 @@
 #include "testclass.h"
 #include <iostream>
 using namespace std;
-int TestClass::counter = 0;
+int Object::counter = 0;
 
-int TestClass::getCounter()
+int Object::getCounter()
 {
     return counter;
 }
 
-TestClass::TestClass(int x, int y, int value)
+Object::Object(int x, int y, int value)
 {
     this->x = x;
     this->y = y;
@@ -18,7 +18,7 @@ TestClass::TestClass(int x, int y, int value)
     cout << "TestClass Constructure has been invoked. Class ID is " << classId << endl;
 }
 
-TestClass::TestClass(const TestClass & obj)
+Object::Object(const Object & obj)
 {    
     this->x = obj.x;
     this->y = obj.y;
@@ -28,17 +28,17 @@ TestClass::TestClass(const TestClass & obj)
     cout << "TestClass Implicit Constructure has been invoked. Class ID is " << classId << endl;
 }
 
-TestClass::~TestClass()
+Object::~Object()
 {
     delete p;
 }
 
-void TestClass::getPosition() const
+void Object::getPosition() const
 {
     cout << "x: " << this->x << endl << "y: " << this->y << endl;
 }
 
- void TestClass::setPosition(int x, int y)
+ void Object::setPosition(int x, int y)
  {
      this->x = x;
      this->y = y;

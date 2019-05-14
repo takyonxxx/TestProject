@@ -7,6 +7,14 @@
 //while a program is running, such as an attempt to divide by zero. ...
 //C++ exception handling is built upon three keywords: try, catch, and throw.
 
+class CanGoWrong{
+public:
+    CanGoWrong(){
+        char *pMemory = new char [1024];
+        delete []pMemory;
+    }
+};
+
 double division(int a, int b) {
    if( b == 0 )
    {
@@ -15,9 +23,28 @@ double division(int a, int b) {
    return (a/b);
 }
 
-struct MyException : public exception {
-   const char * what () const throw () {
-      return "C++ test exception";
+void goesWrong()
+{
+    bool error1 = true;
+    bool error2 = false;
+
+    if(error1)
+    {
+     throw bad_alloc();
+    }
+
+    if(error2)
+    {
+     throw exception();
+    }
+}
+
+struct MyException : public exception
+{
+
+public:
+  virtual const char * what () const {
+      return "Something went wrong";
    }
 };
 
