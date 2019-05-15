@@ -45,6 +45,8 @@ A class has all members private by default. A struct is a class where members ar
 #include "algorithm.h"
 #include "pragmadirective.h"
 #include "casting.h"
+#include "vectors_maps.h"
+#include "stack_queue.h"
 
 //MVC Model-View-Controller
 #include "view.h"
@@ -616,8 +618,7 @@ int main(int argc, char *argv[])
     {
         writeBinary();
         readBinary();
-    }
-    */
+    }    
 
     //Casting
     {
@@ -629,7 +630,20 @@ int main(int argc, char *argv[])
         cout << endl;
         const int myConst = 5;
         int *nonConst = const_cast<int*>(&myConst); // removes const
+    }    
+
+    //Vectors
+    {
+        testVectors();
+        testMaps();
+        testSet();
     }
+
+    //Stack, Queue
+    {
+        testStack();
+        testQueue();
+    }*/
 
     requireEnter();
 

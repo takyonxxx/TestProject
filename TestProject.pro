@@ -33,7 +33,9 @@ HEADERS += \
     pragmadirective.h \
     racingexample.h \
     singleton.h \
+    stack_queue.h \
     stream.h \
     template.h \
     testclass.h \
+    vectors_maps.h \
     view.h

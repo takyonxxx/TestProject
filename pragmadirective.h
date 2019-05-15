@@ -39,6 +39,7 @@ For example: any code written after the return statement in a function is unreac
 #pragma warn -rvl /* return value */
 #pragma warn -par /* parameter never used */
 #pragma warn -rch /*unreachable code */
+#pragma execution_character_set("utf-8")
 
 int show(int x)
 {
