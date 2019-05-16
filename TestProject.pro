@@ -7,7 +7,8 @@ CONFIG +=  -fno-exceptions
 
 SOURCES += \
         main.cpp \
-        testclass.cpp
+        testclass.cpp \
+        vario.cpp
 
 HEADERS += \
     accessmodifiers.h \
