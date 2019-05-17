@@ -1,6 +1,6 @@
-#include <Wire.h>                   // Biblioteca de interface I2C
+#include <Wire.h>                   // I2C interface library
 #include <Adafruit_Sensor.h>
-#include <Adafruit_BMP280.h>                     // Biblioteca Piezo Tone
+#include <Adafruit_BMP280.h>        // Piezo Tone Library
 #include "U8glib.h"
 #include <EEPROM.h>
 
@@ -10,8 +10,12 @@
 float measurementConstant = 0.1;
 float estimationConstant = 0.1;
 float noiseConstant = 0.05;
+float tempo = 0.0;
 
-bool beepOn = false;
+// for reading non important sensors for every second
+unsigned long get_time_second = millis();
+
+bool beepOn = true;
 bool refAltitudeOn = false;
 bool getRefAltitude = false;
 
@@ -29,17 +33,16 @@ Adafruit_BMP280 sensor_bmp;
 short speaker_pin1 = 8;                //arduino speaker output -
 short speaker_pin2 = 9;                //arduino speaker output +
 
-float vario_down = -2.3;               // Definir a redução
-float vario_emergence = -5.1;               // Definir a redução
-float vario_up;
+float vario_down = -2.3;
+float vario_emergence = -5.1;
+float vario_up = 0.25;
 float alt[51];
 float tim[51];
 float beep;
 float Beep_period;
-float mux = 0.3;
-float muxTmp = 0.3;
+float mux = 0.25;
+float muxTmp = 0.25;
 
-float Alt = 0.0;                 // Altura zero, no momento da inclusão +!
 float vario = 0.0;
 
 float Altitude = 0.0;
@@ -51,58 +54,153 @@ unsigned long time;
 unsigned char samples=10;
 unsigned char maxsamples=50;
 unsigned char countPressVal = 0;
-unsigned char tela = 0;
+unsigned char screen = 0;
 unsigned char menu = 2;
 unsigned char memo = 1;
 
 
-//botão
+//button
 unsigned char buttonState;
 unsigned long duration;
 unsigned long resettime;
-unsigned char estadobotao=0;
+unsigned char buttonStatus=0;
 unsigned long lastDebounceTime = 0;
-unsigned long debounceDelay = 20; //debounce botão
+unsigned long debounceDelay = 20; //debounce button
 
 
-//relogio
-unsigned char relogio=0;
-unsigned char segundo = 0, minuto = 0, hora = 0;
+//clock
+unsigned char m_clock = 0;
+unsigned char m_second = 0, m_minute = 0, m_hour = 0;
 unsigned long UtlTime;
 unsigned long lastMillis;
 
 
-//variaveis para  confirmar decolagem
+//variables to confirm takeoff
 unsigned long temp_alt;
 unsigned char temp_verif_alt = 0;
 unsigned char ult_altitude;
 
-//variaveis gravação memoria
-int num_memo=0;
-float Mvarioup=00.0;
-float Mvariodown=00.0;
-float MaltitudeMax=0000.0;
-float MaltitudeDec=0000.0;
-float Mganho=0000.0;
-float Mpouso=0000.0;
+//Variables Memory Recording
+int num_memo = 0;
+float Mvarioup = 00.0;
+float Mvariodown = 00.0;
+float MaltitudeMax = 0000.0;
+float MaltitudeDec = 0000.0;
+float m_gain = 0000.0;
+float m_landing = 0000.0;
 int endfly;
-int end_memo=1;
-unsigned long gravatempo;
-int ler=1;
+int end_memo = 1;
+unsigned long m_savetime;
+int memory = 1;
 
-//variaveis para ler memorias
+//Variables to Read Memories
 float Rvarioup=00.0;
 float Rvariodown=00.0;
 float RaltitudeMax=0000.0;
-float Rganho=0000.0;
-unsigned char Rhora;
-unsigned char Rminuto;
-int Rend_memo=1;//ler memoria
+float Rgain=0000.0;
+unsigned char Rm_hour;
+unsigned char Rm_minute;
+int Rend_memo=1; //read memory
 int Rend_memo_display=1;
 unsigned char Nmeno_display=1;
 
-int  decolagem = 0;
+int  m_takeoff = 0;
 boolean  thermalling = false;
+
+//Dump the content of the EEPROM
+void dump(byte* adr, unsigned int len = 0x80);
+void dump_P(byte* adr, unsigned int len = 0x80);
+void dump_E(byte* adr, unsigned int len = 0x80);
+
+char hexNibble(byte val) {
+    val &= 0xF;
+    if (val > 9) {
+        return val + 'A' - 10;
+    } else {
+        return val + '0';
+    }
+}
+
+void hexByte(char* store, byte val) {
+    store[1] = hexNibble(val);
+    store[0] = hexNibble(val >> 4);
+}
+
+char* toHex(unsigned int val, byte adrTyp = 0) {
+    static char textBuf[9];
+    if (adrTyp) {
+        switch (adrTyp) {
+        case 1: textBuf[0] = ' '; break;
+        case 2: textBuf[0] = 'r'; break;
+        case 3: textBuf[0] = 'p'; break;
+        case 4: textBuf[0] = 'e'; break;
+        }
+        textBuf[1] = ' ';
+        hexByte(textBuf + 2, (byte)(val >> 8));
+        hexByte(textBuf + 4, (byte)val);
+        textBuf[6] = ':';
+        textBuf[7] = ' ';
+        textBuf[8] = 0;
+    } else {
+        hexByte(textBuf, (byte)val);
+        textBuf[2] = ' ';
+        textBuf[3] = 0;
+    }
+    return textBuf;
+}
+
+void dumpGen(byte (*func)(byte*), byte typ, byte* adr, unsigned int len) {
+    int lines = (len + 15) >> 4;
+    int lenOfLines = lines;
+    bool moreThanOneLine = (lines != 1);
+    byte bytes;
+    for (; lines--; adr += 16, len -= 16) {
+        Serial.print(lenOfLines - lines - 1);
+
+        Serial.print(" -\t");
+        Serial.write(toHex((unsigned int)adr, typ));
+        for (bytes = 0; bytes < 16; bytes++) {
+            if (bytes < len) {
+                Serial.write(toHex((*func)(&adr[bytes])));
+            } else if (moreThanOneLine) {
+                Serial.print(F("   "));
+            }
+        }
+        Serial.print(F("'"));
+        for (bytes = 0; bytes < 16; bytes++) {
+            if (bytes < len) {
+                byte cVal = (*func)(&adr[bytes]);
+                Serial.write((cVal & 0x7F) < 0x20 ? '.' : cVal);
+            }
+        }
+        Serial.print(F("'\r\n"));
+    }
+}
+
+byte ramReadByte(byte* adr) {
+    return *adr;
+}
+
+byte flashReadByte(byte* adr) {
+    return pgm_read_byte_near(adr);
+}
+byte eepromReadByte(byte* adr) {
+    return eeprom_read_byte(adr);
+}
+
+void dump(byte* adr, unsigned int len) {
+    dumpGen(ramReadByte, 2, adr, len);
+}
+
+void dump_P(byte* adr, unsigned int len) {
+    dumpGen(flashReadByte, 3, adr, len);
+}
+
+void dump_E(byte* adr, unsigned int len) {
+    dumpGen(eepromReadByte, 4, adr, len);
+}
+//end of eeprom dump
+
 
 void play_welcome_beep()
 {
@@ -187,21 +285,24 @@ const uint8_t rook_bitmap[] PROGMEM = { /* 0X00,0X01,0X80,0X00,0X40,0X00, */
 
 
 
-void draw(void) {
-
+void draw(void)
+{
     u8g.setColorIndex(1); // Instructs the display to draw with a pixel on.
     u8g.setFont(u8g_font_8x13Br); //para o alfabeto completo com caracteres tirar o r do font_8x13Br
-    if(tela == 0){
+    if(screen == 0)
+    {
         u8g.drawBitmapP( 0, 0, 16, 64, rook_bitmap);
     }
-    else if(tela == 1){
+    else if(screen == 1)
+    {
         u8g.setColorIndex(0);
         u8g.setColorIndex(1);
-        u8g.drawStr( 8, 30, "**  LET'S  **"); //acentos http://www.ascii-code.com/
-        u8g.drawStr( 37, 50, " FLY  ");
+        u8g.drawStr( 13, 30, "**  LET'S  **"); //acentos http://www.ascii-code.com/
+        u8g.drawStr( 38, 50, "  FLY  ");
     }
 
-    if(tela == 2){
+    if(screen == 2)
+    {
         u8g.setColorIndex(0);
         u8g.setColorIndex(1);
 
@@ -209,19 +310,20 @@ void draw(void) {
         unsigned char posAlt = 0;
         //temperatura
 
-        u8g.setPrintPos(0, 14);
+        u8g.setPrintPos(0, 16);
         u8g.print(Temperature,1);
-        u8g.drawStr( 35, 14, "C"); //acentos http://www.ascii-code.com/
+        u8g.drawStr( 35, 16, "C");
 
-        //caixa e m/s vario
+        //box and m / s vario
 
-        u8g.drawFrame(50,3,78,35); //quadrado vario
-        u8g.drawStr(103, 33, "M\057s"); //m/s
-        u8g.drawStr(120, 64, "M"); //M altimetro
+        u8g.drawFrame(46,3,82,35); // square vario
+        u8g.drawStr(100, 33, "M\057s"); //m/s
+        u8g.drawStr(120, 64, "M"); //M altimeter
 
-        //sensibilidade e relogio
-        if(relogio==1){
-            if(countPressVal != 1 && countPressVal != 0)
+        //submenu and clock
+        if(m_clock == 1)
+        {
+            if(countPressVal == 2 || countPressVal == 3)
             {
                 u8g.drawStr(0, 30, "v");
                 u8g.setPrintPos(10, 30);
@@ -235,67 +337,88 @@ void draw(void) {
             {
                 u8g.drawStr(0, 30, "Alt2");
             }
+            else if(countPressVal == 4)
+            {
+                if(!beepOn)
+                {
+                    u8g.drawStr(0, 30, "S_ON");
+                }
+                else
+                {
+                    u8g.drawStr(0, 30, "S_OFF");
+                }
+            }
         }
         else{
             String timex = "";
-            if(hora < 10){
+            if(m_hour < 10){
                 timex += "0";
             }
-            timex += hora;
-            if (segundo%2==0)
+            timex += m_hour;
+            if (m_second%2==0)
             {
                 timex += ":";
             }
             else{
                 timex += " ";
             }
-            if(minuto < 10){
+            if(m_minute < 10){
                 timex += "0";
             }
-            timex += minuto;
+            timex += m_minute;
 
             u8g.setPrintPos(0, 34);
             u8g.print(timex);
 
-            u8g.setFont(u8g_font_6x13Br);
-            u8g.setPrintPos(15, 58);
-            u8g.print(mux);
+            u8g.setFont(u8g_font_5x8r);
+            u8g.setPrintPos(12, 62);
+            u8g.print(".");
+            u8g.print(mux * 100, 0);
+
+            u8g.setPrintPos(12, 50);
+
+            if(beepOn)
+            {
+                u8g.print("sON");
+            }
+            else
+            {
+                u8g.print("sOFF");
+            }
         }
 
-
-        //altimetro
+        //altimetre
         if (Altitude >= 1000)
         {
-            posAlt = 28;
+            posAlt = 33;
         }
         else
         {
-            posAlt = 48;
+            posAlt = 44;
         }
-        u8g.setFont(u8g_font_fub20n); //se for so numeros usar o n no fim u8g.setFont(u8g_font_fub20n);
+        u8g.setFont(u8g_font_fub20n); //if it's only numbers use n at the end u8g.setFont (u8g_font_fub20n);
         u8g.setPrintPos(posAlt, 64);
         u8g.print(Altitude, 1);
 
         //vario
         if (vario < 0)
         {
-            posVar = 52;
+            posVar = 48;
             if(vario < -0.1){
-                u8g.drawTriangle(113,15, 122,7, 105,7);
+                u8g.drawTriangle(111,15, 120,7, 103,7);
             }
         }
         else
         {
-            posVar = 61;
+            posVar = 57;
             if(vario > 0.1){
-                u8g.drawTriangle(114,6, 124,15, 104,15);
+                u8g.drawTriangle(111,7, 120,15, 103,15);
             }
         }
         u8g.setPrintPos(posVar, 30);
         u8g.print(vario,1);
 
-
-        //bateria
+        //read battery value
         int vcc = vRef.readVcc();
 
         u8g.drawFrame(4,42,4,2);
@@ -309,20 +432,18 @@ void draw(void) {
         if(vcc > 3000){
             u8g.drawStr( 1, 50, ".");
         }
-
-        if(!beepOn)
-            beepOn = true;
     }
 
     //-------------------menu-------------
-    if(tela == 3){
+
+    if(screen == 3)
+    {
         u8g.setColorIndex(0);
         u8g.setColorIndex(1);
 
+        //retrieves data from eeprom
 
-        //recupera dados da eeprom
-
-        if(Rend_memo_display == 1){ //indica em qual memori o display esta solicitando
+        if(Rend_memo_display == 1){ //indicates which memory the display is requesting
             Rend_memo=2;
         }
         if(Rend_memo_display == 2){
@@ -332,11 +453,12 @@ void draw(void) {
             Rend_memo = (Rend_memo_display*20) + 2;
         }
 
-        if(ler==0){
-            EEPROM.get(Rend_memo, Rhora);
+        if(memory == 0)
+        {
+            EEPROM.get(Rend_memo, Rm_hour);
             delay(10);
             Rend_memo = Rend_memo +1;
-            EEPROM.get(Rend_memo, Rminuto);
+            EEPROM.get(Rend_memo, Rm_minute);
             delay(10);
             Rend_memo = Rend_memo + 2;
             EEPROM.get(Rend_memo, Rvarioup);
@@ -348,88 +470,88 @@ void draw(void) {
             EEPROM.get(Rend_memo, RaltitudeMax);
             delay(10);
             Rend_memo = Rend_memo + 4;
-            EEPROM.get(Rend_memo, Rganho);
+            EEPROM.get(Rend_memo, Rgain);
             delay(10);
 
-            ler=1;
+            memory = 1;
         }
 
         u8g.drawRFrame(0, 0, 128, 16, 4);
         u8g.setPrintPos(4, 13);
-        u8g.print(Nmeno_display);// numero do voo
-        u8g.drawStr(20, 13, "MEMORY");
+        u8g.print(Nmeno_display);// flight number
+        u8g.drawStr(20, 13, "\tMEMORY");
+        //Shows flights
 
-        //Mostra memoria dos voos
-
-
-        String Rtimex = ""; //organiza a hr do voo
-        if(Rhora < 10){
+        String Rtimex = ""; //arranges flight hr
+        if(Rm_hour < 10){
             Rtimex += "0";
         }
-        Rtimex += Rhora;
+        Rtimex += Rm_hour;
         Rtimex += ":";
-        if(Rminuto < 10){
+        if(Rm_minute < 10){
             Rtimex += "0";
         }
-        Rtimex += Rminuto;
+        Rtimex += Rm_minute;
 
         u8g.drawStr(45, 13, ".");
         u8g.setPrintPos(80, 13);
-        u8g.print(Rtimex); //memoria eeprom aqui
+        u8g.print(Rtimex); //eeprom memory here
         //u8g.drawStr(22, 31, ":");
         u8g.drawTriangle(10,22, 20,31, 0,31);
         u8g.setPrintPos(26, 31);
-        u8g.print(Rvarioup,1); //memoria eeprom aqui
+        u8g.print(Rvarioup,1); //eeprom memory here
         //u8g.drawStr(82, 31, ":");
         u8g.drawTriangle(70,30, 79,22, 62,22);
         u8g.setPrintPos(82, 31);
-        u8g.print(Rvariodown,1); //memoria eeprom aqui
+        u8g.print(Rvariodown,1); //eeprom memory here
         u8g.drawStr(0, 47, "Alt.Max:");
         u8g.setPrintPos(68, 47);
-        u8g.print(RaltitudeMax,1); //memoria eeprom aqui
-        u8g.drawStr(0, 64, "Alt.Gain:"); //fazer conta da maxima menos decolagem
+        u8g.print(RaltitudeMax,1); //eeprom memory here
+        u8g.drawStr(0, 64, "Alt.Gain:"); //gain from takeoff
         u8g.setPrintPos(71, 64);
-        u8g.print(Rganho,1); //memoria eeprom aqui
+        u8g.print(Rgain,1); //eeprom memory here
     }
 
-    if(tela==4){
+    if(screen==4){
 
         u8g.setColorIndex(0);
         u8g.setColorIndex(1);
         u8g.drawStr( 25, 30, "MEMORY");
         u8g.drawStr( 37, 50, "Cleared");
 
-        delay(500);
+        delay(250);
         menu=5;
     }
 
-    if(tela==5){
+    if(screen==5){
 
         u8g.setColorIndex(0);
         u8g.setColorIndex(1);
         u8g.drawStr( 25, 35, "OK :)");
-        delay(500);
+        delay(250);
         menu=2;
-
     }
-
-
 }
 
 void setup()
 {
-    Serial.begin(9600);// start serial monitor
-    Wire.begin();                   // Inicializa i2c
+    //Serial.begin(9600);
+
+    //dump eeprom to serial port
+    //dump_E((byte*)0, 0x0400); // 1K standard
+
+    Wire.begin();                //  Initialize i2c
     pinMode(4, INPUT);
     digitalWrite(4, HIGH);
-    pinMode(tone_out1, OUTPUT);  // Dinâmica pin8 de saída -
-    pinMode(tone_out2, OUTPUT);  // Speaker pin9 saída +
-    sensor_bmp.begin(); // Sensibilidade do sensor de pressão
-    vRef.begin(); //inicia leitura da voltagem da bateria
+    pinMode(tone_out1, OUTPUT);  // Dynamic pin8 output -
+    pinMode(tone_out2, OUTPUT);  // Speaker pin9 output  +
+    sensor_bmp.begin(); // Sensitivity of pressure sensor
+    vRef.begin(); //initiates reading of battery voltage
 
-    //ler memoria a gravar
-    num_memo = EEPROM.read(1); //ultima gravação antes de ser desligado
+    //read memory to record
+    num_memo = EEPROM.read(1); //last recording before being turned off
     delay(10);
+
     num_memo ++;
     if(num_memo > 20){num_memo = 1;}
     if(num_memo < 1){num_memo = 1;}
@@ -439,72 +561,79 @@ void setup()
     play_welcome_beep();
 }
 
-
 void loop(void)
 {
     //oled display
     time = millis() / 300;
     u8g.firstPage();
-    // Tempo de calibragem
+
     if (time <= 5)//start screen
     {
-        tela = 0;
+        screen = 0;
     }
     else if(time >5 && time <= 25)//Lets fly screen
     {
-        tela = 1;
+        screen = 1;
     }
     else
     {
-        tela = menu;
+        screen = menu;
 
-        //--------------salvar dados-----------
+        //--------------save data-----------
 
         if(vario > Mvarioup){Mvarioup=vario;} //grava na variavel a maior acendente
         if(vario < Mvariodown){Mvariodown=vario;} //grava na variavel a maior descendente
 
         if(Altitude > MaltitudeMax){
-            MaltitudeMax=Altitude;
+            MaltitudeMax = Altitude;
         }
-        //grava na variavel a maior Altitude e ganho comparando com a decolagem
 
-        MaltitudeDec=Altitude;
+        MaltitudeDec = Altitude;
 
-        if(millis()-temp_alt<0)
+        if(millis() - temp_alt < 0)
         {
-            temp_alt=millis();
+            temp_alt = millis();
         }
-        else{
-            temp_verif_alt=int((millis()-temp_alt)/1000);   // contador de segundos
+        else
+        {
+            temp_verif_alt = int((millis() - temp_alt)/1000);
         }
-        if(temp_verif_alt>20 && decolagem==0)
+        if(temp_verif_alt > 20 && m_takeoff == 0)
         {
             temp_verif_alt = 0;
-            MaltitudeDec=Altitude;
+            MaltitudeDec = Altitude;
 
-            if((Altitude - ult_altitude < -5.0 || Altitude - ult_altitude > 5.0) && menu == 2){
-                decolagem=1;
+            if((Altitude - ult_altitude < -5.0 || Altitude - ult_altitude > 5.0) && menu == 2)
+            {
+                m_takeoff = 1;
             }
         }
         ult_altitude = MaltitudeDec;
-        Mganho = MaltitudeMax - MaltitudeDec;
+        m_gain = MaltitudeMax - MaltitudeDec;
 
-        //se depois de 5 segundos a variação de altura nao for maior que 2 metros salva voo na memoria
-
-        if((Mpouso-Altitude < 2 || Mpouso-Altitude > -2) && menu == 2 && endfly==0 && decolagem==1){
-            gravatempo = millis();
-            endfly=1;
+        //Flight ended.
+        if((m_landing - Altitude < 2 || m_landing - Altitude > -2) && menu == 2 && endfly == 0 && m_takeoff == 1)
+        {
+            m_savetime = millis();
+            endfly = 1;
         }
 
-        Mpouso = Altitude;
-        if(Mpouso-Altitude < 2 && Mpouso-Altitude > -2 && menu == 2 && endfly==1){
-            if (millis() - gravatempo > 5000) {
+        m_landing = Altitude;
+        if(m_landing - Altitude < 2 && m_landing - Altitude > -2 && menu == 2 && endfly == 1)
+        {
+            if (millis() - m_savetime > 5000)
+            {
+                //save the whole on eeprom!!!
 
-                //salva a porra toda na eeprom!!!
-                EEPROM.write(1, num_memo); //grava o numero da memoria da ultima gravação de voo, para sobrescrever a mais antiga.
+                if(num_memo == EEPROM.length())  //check if address counter has reached the end of EEPROM
+                {
+                    num_memo = 1;              //if yes: reset address counter
+                }
+
+                EEPROM.write(1, num_memo); //writing the last record memory adress.
                 delay(10);
 
-                if(num_memo == 1){ //local para primeira memoria local 2 do eeprom
+                if(num_memo == 1){
                     end_memo=2;
                 }
                 if(num_memo == 2){
@@ -515,10 +644,10 @@ void loop(void)
                     end_memo = (num_memo*20) + 2;
                 }
 
-                EEPROM.put(end_memo, hora);
+                EEPROM.put(end_memo, m_hour);
                 delay(10);
                 end_memo = end_memo + 1;
-                EEPROM.put(end_memo, minuto);
+                EEPROM.put(end_memo, m_minute);
                 delay(10);
                 end_memo = end_memo + 2;
 
@@ -531,100 +660,131 @@ void loop(void)
                 EEPROM.put(end_memo, MaltitudeMax);
                 delay(10);
                 end_memo = end_memo + 4;
-                EEPROM.put(end_memo, Mganho);
+                EEPROM.put(end_memo, m_gain);
                 delay(10);
-                endfly=0;
 
+                endfly = 0;
             }
         }
     }
 
     int currentState = (digitalRead (4));
+
     if (currentState != buttonState)
     {
         duration = millis();
         resettime = millis();
     }
 
-    if(currentState ==LOW)
+    if(currentState == LOW)
     {
-        if ((millis() - duration > 25) && (millis() - duration < 3000)&& menu == 2 && estadobotao==0)
+        if ((millis() - duration > 5) && (millis() - duration < 2000) && menu == 2 && buttonStatus == 0)
         {
-            //Serial.println("long click");
             countPressVal++;
             if(beepOn)
                 tone(tone_out1,1800,40);
-            delay(80);
+
+            delay(10);
+
             if(countPressVal > 4){countPressVal = 0;}
 
-            //mostra relogio e variaçaõ
             lastMillis = millis();
-            relogio = 1;
-            estadobotao=1;
+            m_clock = 1;
+            buttonStatus = 1;
         }
 
-        if (millis() - duration > 3000 && menu == 2 && estadobotao==1) {
-            //voos gravados
-            ler =0;
+        if (millis() - duration > 2000 && menu == 2 && buttonStatus == 1)
+        {
+            memory =0;
             menu = 3;
             duration = millis();
         }
 
-        if (millis() - duration > 3000 && menu == 3 && estadobotao==1) {
-            //tela vario
+        if (millis() - duration > 2000 && menu == 3 && buttonStatus == 1)
+        {
             menu = 2;
             Nmeno_display = 1;
             Rend_memo_display = EEPROM.read(1);
             duration = millis();
         }
 
-        //menu configurações
-        if (millis() - resettime > 9000 && (menu == 2 || menu == 3) && estadobotao==1) {
+        if (millis() - resettime > 5000 && (menu == 2 || menu == 3) && buttonStatus == 1)
+        {
+            menu = 4;
 
-            menu=4;
+            for (int i = 0; i < EEPROM.length(); i++)
+            {
+                if(EEPROM.read(i) != 0) //skip already "empty" addresses
+                {
+                    EEPROM.write(i, 0);
+                }
+            }
 
-            // grave 0 em todos os 512 bytes da EEPROM
-            for (int i = 0; i < 512; i++)
-                EEPROM.write(i, 0);
+            if( countPressVal > 1)
+                countPressVal = 0;
+
+            num_memo = 1;
+
+            EEPROM.write(1, num_memo); //writing the last record memory adress.
+            delay(10);
+
             Nmeno_display = 1;
+
             Rend_memo_display = EEPROM.read(1);
             resettime = millis();
         }
 
-        if ((millis() - duration >5) && (millis() - duration < 2000)&& menu == 3 && estadobotao==0) {
-            ler =0;
-            Nmeno_display++; // mostra so o numero do voo
-            Rend_memo_display--; //puxa a pemoria de voo da mais rescente pra mais antiga
-            if(Rend_memo_display < 1){Rend_memo_display=20;}
-            if(Nmeno_display > 20){Nmeno_display=1;}
-            estadobotao=1;
-        }
+        if ((millis() - duration > 5) && (millis() - duration < 2000)&& menu == 3 && buttonStatus==0)
+        {
+            memory = 0;
+            Nmeno_display++; // Show only the flight number
+            Rend_memo_display--; // pulls the memory of flight from the oldest to the oldest
+            if(Rend_memo_display < 1){Rend_memo_display = 20;}
+            if(Nmeno_display > 20){Nmeno_display = 1;}
+            buttonStatus = 1;
+            if(beepOn)
+                tone(tone_out1,1800,40);
 
+            delay(10);
+
+            if( countPressVal > 1)
+                countPressVal = 0;
+        }
     }
-    if(currentState ==HIGH){
-        estadobotao=0;
+    if(currentState ==HIGH)
+    {
+        buttonStatus = 0;
     }
+
     buttonState = currentState;
 
-    // == MENU SENSIBILIDADE PARA LEVANTAR ==
+    //SENSITIVITY
 
-    if((countPressVal) == 0) {refAltitudeOn = false;} // 1 sinal
-    if((countPressVal) == 1) {refAltitudeOn = true;} // 2 sinal
-    if((countPressVal) == 2) {muxTmp = 0.3;} // 3 sinal
+    if((countPressVal) == 2) {muxTmp = 0.25;} // 3 sinal
     if((countPressVal) == 3) {muxTmp = 0.5;} // 4 sinal
-    if((countPressVal) == 4) {muxTmp = 0.8;} // 5 sinal
 
-    vario_up = mux;
-
-    //mostra relogio e variaçaõ
-    if (lastMillis > 0 && (millis() - lastMillis > 3000))
+    //mostra m_clock e variaÃ§aÃµ
+    if (lastMillis > 0 && (millis() - lastMillis > 2500))
     {
-        relogio = 0;
+        m_clock = 0;
         lastMillis = 0;
 
-        if((countPressVal) == 2) {mux = 0.3;} // 3 sinal
-        if((countPressVal) == 3) {mux = 0.5;} // 4 sinal
-        if((countPressVal) == 4) {mux = 0.8;} // 5 sinal
+        if(menu == 2)
+        {
+            if((countPressVal) == 0) {refAltitudeOn = false;} // 1 sinal
+            if((countPressVal) == 1) {refAltitudeOn = true;} // 2 sinal
+            if((countPressVal) == 2) {mux = 0.25;} // 3 sinal
+            if((countPressVal) == 3) {mux = 0.5;} // 4 sinal
+            if((countPressVal) == 4)
+            {
+                if(beepOn)
+                    beepOn = false;
+                else
+                    beepOn = true;
+            } //5 sinal
+
+            vario_up = mux;
+        }
 
         if(countPressVal > 1)
         {
@@ -639,15 +799,21 @@ void loop(void)
         }
     }
 
-    float tempo = millis();
-    float N1=0;
-    float N2=0;
-    float N3=0;
-    float D1=0;
-    float D2=0;
+    tempo = millis();
+    float N1 = 0;
+    float N2 = 0;
+    float N3 = 0;
+    float D1 = 0;
+    float D2 = 0;
 
-    Temperature = (sensor_bmp.readTemperature());
-    auto tmpAlt  = (sensor_bmp.readAltitude(1013.25));// calculate altitude
+    //every second get temperature and battery level
+    if (millis() >= (get_time_second + 1000))
+    {
+        Temperature = (sensor_bmp.readTemperature());
+        get_time_second = millis();
+    }
+
+    auto tmpAlt  = (sensor_bmp.readAltitude(1013.25)); // calculate altitude
 
     if(!getRefAltitude)
     {
@@ -655,105 +821,118 @@ void loop(void)
         getRefAltitude = true;
     }
 
-    for(int cc=1;cc<=maxsamples;cc++){                                   // averager
-        alt[(cc-1)]=alt[cc];
-        tim[(cc-1)]=tim[cc];
+    for(int cc=1;cc<=maxsamples;cc++)
+    {
+        alt[(cc-1)] = alt[cc];
+        tim[(cc-1)] = tim[cc];
     };
 
-    alt[maxsamples]=tmpAlt;
-    tim[maxsamples]=tempo;
-    float stime=tim[maxsamples-samples];
-    for(int cc=(maxsamples-samples);cc<maxsamples;cc++){
-        N1+=(tim[cc]-stime)*alt[cc];
-        N2+=(tim[cc]-stime);
-        N3+=(alt[cc]);
-        D1+=(tim[cc]-stime)*(tim[cc]-stime);
-        D2+=(tim[cc]-stime);
+    alt[maxsamples] = tmpAlt;
+    tim[maxsamples] = tempo;
+    float stime = tim[maxsamples-samples];
+    for(int cc = (maxsamples-samples); cc<maxsamples; cc++)
+    {
+        N1 += (tim[cc]-stime)*alt[cc];
+        N2 += (tim[cc]-stime);
+        N3 += (alt[cc]);
+        D1 += (tim[cc]-stime)*(tim[cc]-stime);
+        D2 += (tim[cc]-stime);
     };
 
     Altitude = altitudeKalmanFilter.updateEstimate(round(tmpAlt*100)/100.0);   //apply kalman filter
 
-    //Serial.println(RefAltitude);
     if(refAltitudeOn)
     {
         Altitude = Altitude - RefAltitude;
-        if(Altitude < 0) Altitude = 0.0;
+        //if(Altitude < 0) Altitude = 0.0;
     }
 
     auto tmpVario  = 1000.0*(float)((samples*N1)-N2*N3)/(float)(samples*D1-D2*D2); // calculate vario
+
     vario = varioKalmanFilter.updateEstimate(round(tmpVario*100)/100.0);   //apply kalman filter
 
-    if ((tempo-beep)>Beep_period)
+    if(vario > 9.9)
     {
-        beep=tempo;
-        if (vario>vario_up && vario<15 )
+        vario = 9.9;
+    }
+
+    auto delayBeep = 300;
+
+    if ((tempo - beep) > Beep_period && screen == 2)
+    {
+        beep = tempo;
+
+        if (vario > vario_up && vario <= 9.9)
         {
-            Beep_period=350-(vario*10);
+            Beep_period = delayBeep + 50 - (vario*20);
+
             if(beepOn)
             {
-                tone(tone_out1,(1000+(100*vario)),300-(vario*5)); // Som em ascensão
-                tone(tone_out2,(1003+(100*vario)),300-(vario*5));
+                tone(tone_out1,(1000 + (100*vario)), delayBeep - (vario*20));
+                tone(tone_out2,(1003 + (100*vario)), delayBeep - (vario*20));
             }
             thermalling = true;
         }
         else if ((vario < 0 ) && (thermalling == true))
         {
             thermalling = false;
-            //tone_out2.play(800, 800); Predpotok // Som (é opcional)
         }
-        else if (vario < vario_down && vario > vario_emergence){         // Som a afundar
-            Beep_period=200;
+        else if (vario < vario_down && vario > vario_emergence)
+        {
+            Beep_period = 200;
             if(beepOn)
             {
-                tone(tone_out1,(300-(vario)),340);
-                tone(tone_out2,(303-(vario)),340);
+                tone(tone_out1,(300 - (vario)), 340);
+                tone(tone_out2,(303 - (vario)), 340);
             }
             thermalling = false;
         }
-        else if (vario < vario_emergence){         // Som emergencia
+        else if (vario < vario_emergence)
+        {
             Beep_period=200;
             if(beepOn)
             {
-                tone(tone_out1,2000,250);
-                tone(tone_out2,2003,250);
+                tone(tone_out1, 2000, 250);
+                tone(tone_out2, 2003, 250);
                 delay(200);
-                tone(tone_out1,1000,250);
-                tone(tone_out2,1003,250);
+                tone(tone_out1, 1000, 250);
+                tone(tone_out2, 1003, 250);
             }
             thermalling = false;
         }
     }
 
-    //relogio
-    if(decolagem==1){ //inicia o cronometro quando detectada a decolagem
-        if(millis()-UtlTime<0)
+    //clock
+    if(m_takeoff == 1){ //inicia o cronometro quando detectada a m_takeoff
+        if(millis() - UtlTime<0)
         {
-            UtlTime=millis();
+            UtlTime = millis();
         }
         else{
-            segundo=int((millis()-UtlTime)/1000);
+            m_second = int((millis()-UtlTime)/1000);
         }
-        if(segundo>59)
+        if(m_second > 59)
         {
-            segundo=0;
-            minuto++;
-            UtlTime=millis();
-            if(minuto>59)
+            m_second = 0;
+            m_minute++;
+            UtlTime = millis();
+            if(m_minute > 59)
             {
-                hora++;
-                minuto=0;
+                m_hour++;
+                m_minute=0;
             }
         }
     }
     else{
-        segundo=00;
-        minuto=00;
-        hora=00;
+        m_second = 00;
+        m_minute = 00;
+        m_hour = 00;
     }
 
-    //-----------mostrar telas-----------
-    do {
+    //-----------mostrar screens-----------
+    do
+    {
         draw();
     } while( u8g.nextPage() );
-    //fim oled display
+    //end oled display
 }
