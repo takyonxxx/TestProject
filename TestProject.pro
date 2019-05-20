@@ -6,9 +6,9 @@ CONFIG -= qt
 CONFIG +=  -fno-exceptions
 
 SOURCES += \
+        complex.cpp \
         main.cpp \
-        testclass.cpp \
-        vario.cpp
+        object.cpp
 
 HEADERS += \
     accessmodifiers.h \
@@ -16,6 +16,8 @@ HEADERS += \
     casting.h \
     chainofresponsibility.h \
     common.h \
+    complex.h \
+    constructors.h \
     controller.h \
     database.h \
     encapsulation.h \
@@ -27,6 +29,7 @@ HEADERS += \
     libraries.h \
     model.h \
     namespace.h \
+    object.h \
     overloadfunction.h \
     overloadoperator.h \
     passvalue.h \
@@ -37,6 +40,5 @@ HEADERS += \
     stack_queue.h \
     stream.h \
     template.h \
-    testclass.h \
     vectors_maps.h \
     view.h

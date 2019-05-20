@@ -1,4 +1,4 @@
-#include "testclass.h"
+#include "object.h"
 #include <iostream>
 using namespace std;
 int Object::counter = 0;

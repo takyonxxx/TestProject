@@ -61,4 +61,41 @@ public:
     }
 };
 
+class TestOp
+{
+    int id;
+    string name;
+
+public:
+
+    TestOp(): id(0), name(""){}
+
+    TestOp(int id, string name): id(id), name(name)
+    {
+    }
+
+    void print() const
+    {
+        cout << id << ": " << name << endl;
+    }
+
+    //Assignment operator;
+    const TestOp &operator=(const TestOp &other)
+    {
+        cout << "Assignment running" << endl;
+        id = other.id;
+        name = other.name;
+        return *this;
+    }
+
+    //Copy Costructor
+    TestOp(const TestOp &other)
+    {
+        cout << "Copy costructor running" << endl;
+        id = other.id;
+        name = other.name;
+    }
+};
+
+
 #endif // OVERLOADOPERATOR_H

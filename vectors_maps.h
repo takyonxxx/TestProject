@@ -264,9 +264,19 @@ public:
     //make the name unique
     bool operator<(const Test & other) const
     {
-        return name < other.name;
+        if(name != other.name)
+            return name < other.name;
+        else
+            return id < other.id;
     }
+    friend bool comp(const Test &a, const Test &b);
+    int getId() const{return id;}
 };
+
+bool comp(const Test &a, const Test &b)
+{
+    return a.id < b.id;
+}
 
 void testSet()
 {
@@ -305,4 +315,59 @@ void testSet()
     }
 }
 
+void testSort()
+{
+    vector<Test> tests;
+    tests.push_back(Test(5, "Turkay"));
+    tests.push_back(Test(10, "Alya"));
+    tests.push_back(Test(7, "Gokhan"));
+    tests.push_back(Test(3, "Muteber"));
+
+    sort(tests.begin(), tests.end());
+
+    for (auto it = tests.begin(); it != tests.end(); it++) {
+        it->print();
+    }
+
+    cout << endl;
+
+    auto itemId = 7;
+    auto itrA = std::find_if(tests.begin() , tests.end() , [&itemId](Test entry){
+            return entry.getId() == itemId;
+});
+
+    if(itrA != tests.end())
+    {
+        itrA->print();
+    }
+
+    itemId = 8;
+    auto found = std::any_of(tests.begin() , tests.end() , [&itemId](Test entry){
+            return entry.getId() == itemId;
+});
+
+    cout << found << endl;
+
+    map<string, vector<int> > scores;
+    scores["Turkay"].push_back(10);
+    scores["Alya"].push_back(9);
+    scores["Gokhan"].push_back(2);
+    scores["Turkay"].push_back(7);
+
+    for (auto it = scores.begin(); it != scores.end(); it++)
+    {
+        auto name = it->first;
+        auto scoreList = it->second;
+
+        cout << name << ": " << flush;
+
+        for (auto i = 0; i < scoreList.size(); i++)
+        {
+            cout << scoreList[i] << " " << flush;
+        }
+        cout << endl;
+    }
+}
+
 #endif // VECTORS_H
+

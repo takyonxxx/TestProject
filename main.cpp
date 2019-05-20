@@ -34,7 +34,7 @@ A class has all members private by default. A struct is a class where members ar
 #include "overloadfunction.h"
 #include "enumaration.h"
 #include "template.h"
-#include "testclass.h"
+#include "object.h"
 #include "inheritance.h"
 #include "polymorphism.h"
 #include "encapsulation.h"
@@ -47,6 +47,8 @@ A class has all members private by default. A struct is a class where members ar
 #include "casting.h"
 #include "vectors_maps.h"
 #include "stack_queue.h"
+#include "constructors.h"
+#include "complex.h"
 
 //MVC Model-View-Controller
 #include "view.h"
@@ -459,8 +461,8 @@ int main(int argc, char *argv[])
         a -= b;
         cout << a.getNr() << endl;
 
-        Complex c1(10, 5), c2(2, 4);
-        Complex c3 = c1 + c2; // An example call to "operator+"
+        Complex1 c1(10, 5), c2(2, 4);
+        Complex1 c3 = c1 + c2; // An example call to "operator+"
         c3.print();
     }    
 
@@ -630,23 +632,91 @@ int main(int argc, char *argv[])
         cout << endl;
         const int myConst = 5;
         int *nonConst = const_cast<int*>(&myConst); // removes const
-    }    
+    }
+    //Stack, Queue
+    {
+        testStack();
+        testQueue();
+    }
 
     //Vectors
     {
         testVectors();
         testMaps();
         testSet();
+        testSort();
     }
 
-    //Stack, Queue
+    //Constructors, operator overloading
     {
-        testStack();
-        testQueue();
+        TestConstructorClass test1(10, "Turkay");
+        test1.print();
+        cout << "print test1: " << flush;
+        //using std::flush causes the stream buffer to flush its output buffer.
+        test1.print();
+
+        TestConstructorClass test2(20, "Alya");
+
+        test2 = test1;
+        cout << "print test2: " << flush;
+        test2.print();
+
+        //Copy Initialization
+        TestConstructorClass test3 = test1;
+        cout << "print test3: " << flush;
+        test3.print();
+
+        TestConstructorClass testPrint1(1, "Turkay");
+        TestConstructorClass testPrint2(2, "Alya");
+        int value = 1 + 2 + 5;
+        // + operator has right to left associativity of operators, first 2 + 5 than 1 + 7 => 1 + (2 +5)
+
+        cout << testPrint1 << " " << testPrint2 << endl;
+        // << (bit shift) operator has left to right associativity of operators, (cout << testPrint) << endl;
+    }
+
+    //Complex Constructors, operator overloading
+    {
+        using namespace turkayProgramming;
+
+        Complex c1(3, 4);
+        Complex c2(3, 4);
+        Complex c2 = c1; // copy
+        c1 = c2; // assignment
+        Complex c3(c1); // copy
+
+        Complex c3 = c1 + c2;
+
+        Complex c4(4, 2);
+        Complex c5 = c4 + 7;
+
+        Complex c6(1, 7);
+        cout << 3.2 + c6 << endl;
+
+        cout << c1 << c2 << c3 << c4 << c5 << c6 << endl;
     }*/
 
-    requireEnter();
+    //Complex comparison, operator
+    {
+        using namespace turkayProgramming;
 
+        Complex c1(2, 4);
+        Complex c2(3, 1);
+
+        if(c1 == c2)
+        {
+            cout << "Equal" << endl;
+        }
+        else if(c1 != c2)
+        {
+            cout << "Not Equal" << endl;
+        }
+
+        //Dereference operator
+         cout << *c1 + *Complex(4, 3) << endl;
+    }
+
+    requireEnter();
     return 0;
 }
 
