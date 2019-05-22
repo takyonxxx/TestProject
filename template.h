@@ -125,4 +125,64 @@ public:
     TemplateClass(char a = 0){cout << "this is from TemplateClass<char>" << endl;};
 };
 
+//replace key of container
+template <typename CONTAINER>
+void replace_key(CONTAINER& container,
+                 const typename CONTAINER::key_type& oldKey,
+                 const typename CONTAINER::key_type& newKey)
+{
+    if(!container.key_comp()(oldKey,newKey) && !container.key_comp()(newKey,oldKey)){
+        return;}
+    auto begin(container.find(oldKey));
+    for(;;){
+        if(begin != container.end()){
+            container.insert(typename CONTAINER::value_type(newKey, begin->second));
+            container.erase(begin);
+            begin = container.find(oldKey);
+        }
+        else{
+            return;
+        }
+    }
+}
+
+//template class, put all in header file
+template <class T>
+class TemplateTest
+{
+    T obj;
+public:
+    TemplateTest(T obj)
+    {
+        this->obj = obj;
+    }
+
+    void print()
+    {
+        cout << obj << endl;
+    }
+};
+
+//template functions
+template<typename T>
+void printTemplate(T n)
+{
+    cout  << "Template: " << n << endl;
+}
+
+//overload function
+void printTemplate(int value)
+{
+    cout << "Non template: " << value << endl;
+}
+
+template <typename T>// also u can use class instead of typename
+void show()
+{
+    cout << T() << endl;
+}
+
+//nested
+
+
 #endif // TEMPLATE_H

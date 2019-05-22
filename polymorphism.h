@@ -20,6 +20,48 @@ Compile time polymorphism: This type of polymorphism is achieved by function ove
 Runtime polymorphism: This type of polymorphism is achieved by Function Overriding.
 */
 
+//object slicing, up casting
+class Parent
+{
+    int one;
+public:
+
+    Parent():one(0){}
+
+    Parent(const Parent& other):one(0)//copy constructor, when we define this
+    //we lose implicit no parmeter constructor so should define default constructor..
+    {
+        one = other.one;
+        cout << "Parent copy constructor" << endl;
+    }
+
+    virtual ~Parent(){}
+
+    virtual void print()
+    {
+        cout << "parent" << endl;
+    }
+
+};
+
+
+class Child : public Parent
+{
+    int two;
+public:
+
+    Child():two(0)//we cant initialize one
+    {
+    }
+
+    ~Child(){}
+
+    void print()
+    {
+        cout << "child" << endl;
+    }
+};
+
 
 class Animal
 {
@@ -27,21 +69,18 @@ protected:
     string voice;
 public:
 
-    Animal()
-    {
-        voice = "Default Voice";
-    }
+    //Animal(){}we cant run constructor, its abstract class
 
     virtual ~Animal() // we should create as virtual for free memory when use delete.
     {
-        cout << "I am from the base class" << endl;
+        cout << "Deconstructor I am from the base class Animal" << endl;
     }
-
-    virtual string getVoice() = 0; // we make class abstract class, // a pure virtual function
+    virtual void run() = 0;
+    virtual string getVoice() = 0; // a pure virtual function, we make class abstract class
     //= 0 tells complier this is abstract class.
 };
 
-class Dog : public Animal
+class Dog : public Animal //Abstrac class, run() not implemented
 {
     string sign;
 public:
@@ -52,14 +91,23 @@ public:
     }
     ~Dog()
     {
-        cout << "I am from the Dog class" << endl;
+        cout << "Deconstructor I am from the Dog class" << endl;
     }
 
-    string getVoice()
+    virtual string getVoice()
     {
         return voice + " " + sign;
     }
 
+};
+
+class Labrador : public Dog
+{
+public:
+    virtual void run()
+    {
+        cout << "Labrador is running" << endl;
+    }
 };
 
 class Cat : public Animal
@@ -73,12 +121,17 @@ public:
     }    
     ~Cat()
     {
-        cout << "I am from the Cat class" << endl;
+        cout << "Deconstructor I am from the Cat class" << endl;
     }
 
-    string getVoice()
+    virtual string getVoice()
     {
         return voice + " " + sign;
+    }
+
+    virtual void run()
+    {
+        cout << "Cat is running" << endl;
     }
 
 };
@@ -94,14 +147,26 @@ public:
     }
     ~Cow()
     {
-        cout << "I am from the Cow class" << endl;
+        cout << "Deconstructor I am from the Cow class" << endl;
     }
 
-    string getVoice()
+    virtual string getVoice()
     {
        return voice + " " + sign;
     }
 
+    virtual void run()
+    {
+        cout << "Cow is running" << endl;
+    }
+
 };
+
+void testAnimal(Animal &a)
+{
+    a.run();
+}
+
+
 
 #endif // POLYMORPHISM_H

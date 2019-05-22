@@ -49,6 +49,19 @@ A class has all members private by default. A struct is a class where members ar
 #include "stack_queue.h"
 #include "constructors.h"
 #include "complex.h"
+#include "linkedlist.h"
+#include "pointers.h"
+#include "functors.h"
+#include "decltype.h"
+#include "enhancedloops.h"
+#include "nestedtemplate.h"
+#include "initialization.h"
+#include "functional.h"
+#include "delegating.h"
+#include "optimization.h"
+#include "lvalue_rvalue.h"
+#include "perfectforwarding.h"
+#include "bind.h"
 
 //MVC Model-View-Controller
 #include "view.h"
@@ -117,15 +130,6 @@ int main(int argc, char *argv[])
         // trying to access private data member
         // directly outside the class
         obj2.compute_area(1.5);
-
-        //protected
-        Child obj3;
-
-        // member function of the derived class can
-        // access the protected data members of the base class
-
-        obj3.setId(81);
-        obj3.displayId();
     }
 
     //inheritance
@@ -136,25 +140,6 @@ int main(int argc, char *argv[])
         p2.Point::setX(47);
         cout << p2.getX() << endl;
         cout << p2.getY() << endl;
-    }
-
-    //polymorphism, virtual functions, abstract class
-    {
-        Dog dog;
-        Cat cat;
-        Cow cow;
-
-        cout <<  dog.getVoice() << endl;
-        cout <<  cat.getVoice() << endl;
-        cout <<  cow.getVoice() << endl;
-
-        Animal *d = &dog;
-        voiceOfAnimal(d);
-        voiceOfAnimal(&cat);
-        voiceOfAnimal(cow);
-
-        //Animal *dog = new Dog;
-        //delete dog;// virtual ~Animal() invoked here
     }
 
     //encapsulation
@@ -464,15 +449,14 @@ int main(int argc, char *argv[])
         Complex1 c1(10, 5), c2(2, 4);
         Complex1 c3 = c1 + c2; // An example call to "operator+"
         c3.print();
-    }    
+    }
 
     //templates generalization
     {
         double array[6] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
         vector<double> vect = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
         cout << Average(array, 6) << endl;
-        cout << GetMaxValue(array, 6) << endl;
-        cout << Average(vect, 6) << endl;
+        cout << GetMaxValue(array, 6) << endl;        
         cout << *(array + 1) << endl; // array is pointer. result 2
         cout << Add<double, double>(2, 5.2) << endl;
 
@@ -497,7 +481,7 @@ int main(int argc, char *argv[])
         TemplateClass<double> c(49.5);
         auto value = c.getValue();
         //specialized class
-        TemplateClass<int*> i(49);       
+        TemplateClass<int*> i(49);
     }
 
     //namespaces
@@ -620,7 +604,7 @@ int main(int argc, char *argv[])
     {
         writeBinary();
         readBinary();
-    }    
+    }
 
     //Casting
     {
@@ -681,11 +665,11 @@ int main(int argc, char *argv[])
 
         Complex c1(3, 4);
         Complex c2(3, 4);
-        Complex c2 = c1; // copy
+        Complex cc2 = c1; // copy
         c1 = c2; // assignment
         Complex c3(c1); // copy
 
-        Complex c3 = c1 + c2;
+        Complex cc3 = c1 + c2;
 
         Complex c4(4, 2);
         Complex c5 = c4 + 7;
@@ -694,7 +678,7 @@ int main(int argc, char *argv[])
         cout << 3.2 + c6 << endl;
 
         cout << c1 << c2 << c3 << c4 << c5 << c6 << endl;
-    }*/
+    }
 
     //Complex comparison, operator
     {
@@ -714,6 +698,165 @@ int main(int argc, char *argv[])
 
         //Dereference operator
          cout << *c1 + *Complex(4, 3) << endl;
+    }
+
+
+    //linklist
+    {
+        testLinkList();
+    }
+
+    //function pointers
+    {
+        testPointers();
+    }
+
+    //Polymorphism
+    {
+        Child c1;
+        Parent &p1 = c1;
+        p1.print();
+
+        Parent p2 = Child(); //copy constructor
+        p2.print();
+
+        //Animal animal; cant implement because its abstract class.
+        //Dog dog; // cant implement because its abstract class.
+
+        Labrador lab;
+        lab.run();
+        cout << lab.getVoice() << endl;
+
+        Cat cat;
+        cat.run();
+        cout << cat.getVoice() << endl;
+
+        Animal *animals[5];
+        animals[0] = &lab;
+        animals[1] = &cat;
+
+        cout << animals[0]->getVoice() << endl;
+        cout << animals[1]->getVoice() << endl;
+
+        Animal *animal = &lab;
+        animal->run();
+
+        testAnimal(cat);
+
+        Cow cow;
+
+        cout <<  cat.getVoice() << endl;
+        cout <<  cow.getVoice() << endl;
+
+        Animal *d = &cat;
+        voiceOfAnimal(d);
+        voiceOfAnimal(&cat);
+        voiceOfAnimal(cow);
+    }
+
+    //Functors
+    {
+        testFunctors();
+    }
+
+    //typeid
+    {
+        testType();
+    }
+
+    //Loops
+    {
+        testloops();
+    }
+
+    //template classes
+    {
+        TemplateTest<string> t1("Hello");
+        t1.print();
+
+        TemplateTest<int> t2(5);
+        t2.print();
+    }
+
+    //template functions
+    {
+        printTemplate<string>("test"); //<string> not to use overload function
+        printTemplate<double>(1.2);
+        printTemplate<int>(6);
+        printTemplate<>(7);
+        printTemplate(8); // non template
+        show<double>();
+    }
+
+    //nested template class
+    {
+        testNestedTemplates();
+    }
+
+    //initialization
+    {
+        testInitialization();
+    }
+
+    //Lambda Expressions
+    {
+        lambdaTest();
+    }
+
+    //Functional
+    {
+        testFunctional();
+    }
+
+    //mutable
+    {
+        int cats = 5;
+        [cats]() mutable
+        {
+            cats = 8; //error if not put mutable
+            cout << "cats: " <<  cats << endl;
+        }();
+
+        cout << "cats: " <<  cats << endl;// not change here, only changed in lambda
+    }
+
+    //delagating
+    {
+        testDelegating();
+    }
+
+    //Elision and Optimization
+    {
+        testOptimization();
+    }
+
+    //rvalue lvalue move constructor move assignment operator
+    {
+        testLvalueRvalue();
+        testMoveConstructor();
+        testMoveAssignmentOperator();
+    }
+
+    //casting
+    {
+        testCasting();
+    }
+
+    //perfect foewarding
+    {
+        testPerfectForwarding();
+    }
+
+    //bind
+    {
+        testBind();
+    }
+
+   */
+    //pointers
+    {
+        //testUniquePointer();
+        testSharedPointer();
     }
 
     requireEnter();

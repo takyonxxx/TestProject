@@ -69,7 +69,7 @@ public:
 
 
 // base class
-class Parent
+class Parent1
 {
     // protected data members
 protected:
@@ -78,7 +78,7 @@ protected:
 };
 
 // sub class or derived class
-class Child : public Parent
+class Child1 : public Parent1
 {
 
 

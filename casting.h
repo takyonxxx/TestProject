@@ -72,10 +72,22 @@ It is a compile time cast.It does things like implicit conversions between types
 */
 
 class Base {
+public:
+    virtual void speak()
+    {
+        cout << "I am parent class." << endl;
+    }
 };
 class Derived : public Base { // Inherited private/protected not public
 };
 
+class Brother : public Base { // Inherited private/protected not public
+};
+
+class Sister : public Base { // Inherited private/protected not public
+};
+
+//compile time
 void static_cast_test()
 {
     float f = 3.5;
@@ -105,6 +117,7 @@ dynamic_cast only supports pointer and reference types.
 It returns NULL if the cast is impossible if the type is a pointer or throws an exception if the type is a reference type.
 */
 
+//runtime
 void dynamic_cast_test()
 {
     Derived *child = new Derived();
@@ -114,6 +127,85 @@ void dynamic_cast_test()
         cout << "dynamic_cast success" << endl;
     else
         cout << "dynamic_cast failed" << endl;
+}
+
+void testCasting()
+{
+    Base parent;
+    Brother brother;
+    Sister sister;
+
+    //static_cast
+    {
+        //this is dangereous, static_cast is just a compile time thing, code work but danger
+        Base *ppb = &brother;
+        //Brother *ppb1 = ppb;//error
+        Brother *pbb = static_cast<Brother*>(ppb);
+
+        Base &&p = Base();
+        //Base &&p1 = parent;//error
+
+        Base &&p1 = static_cast<Base&&>(parent);//safe
+        p1.speak();
+
+        Sister *pss = static_cast<Sister *>(ppb);// return adress
+        if(pss)
+            cout << pss << endl;
+        else
+            cout << "static_cast failed" << endl;
+    }
+
+    //dynamic_cast
+    {
+        Base *ppb = &parent;
+        Brother *pbb = dynamic_cast<Brother *>(ppb);// return nullptr
+        if(pbb)
+            cout << pbb << endl;
+        else
+            cout << "dynamic_cast failed" << endl;
+
+        Base *ppb1 = &brother;
+        Brother *pbb1 = dynamic_cast<Brother *>(ppb1);// return pointer, cast success
+        if(pbb1)
+            cout << pbb1 << endl;
+        else
+            cout << "dynamic_cast failed" << endl;
+
+    }
+
+    //reinterpret_cast
+    {
+        Base *ppb = &brother;
+        Sister *pss = static_cast<Sister *>(ppb);// return adress
+        if(pss)
+            cout << pss << endl;
+        else
+            cout << "reinterpret_cast failed" << endl;
+    }
+
+    cout << endl << "For same comparison" << endl;
+
+    Base *ppb = &brother;
+
+    Sister *pss1 = static_cast<Sister *>(ppb);// return adress
+    if(pss1)
+        cout << "static_cast : " << pss1 << endl;
+    else
+        cout << "static_cast failed" << endl;
+
+    Sister *pss2 = reinterpret_cast<Sister *>(ppb);// return adress
+    if(pss2)
+        cout << "reinterpret_cast : " << pss2 << endl;
+    else
+        cout << "reinterpret_cast failed" << endl;
+
+    //this gives true result.
+    Sister *pss3 = dynamic_cast<Sister *>(ppb);// return adress
+    if(pss3)
+        cout << "dynamic_cast : " << pss3 << endl;
+    else
+        cout << "dynamic_cast failed" << endl;
+
 }
 
 
