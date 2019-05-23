@@ -4,6 +4,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
+        bitmap.cpp \
         complex.cpp \
         main.cpp \
         object.cpp
@@ -12,6 +13,9 @@ HEADERS += \
     accessmodifiers.h \
     algorithm.h \
     bind.h \
+    bitmap.h \
+    bitmapfileheader.h \
+    bitmapinfoheader.h \
     casting.h \
     chainofresponsibility.h \
     common.h \

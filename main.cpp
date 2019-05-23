@@ -62,6 +62,9 @@ A class has all members private by default. A struct is a class where members ar
 #include "lvalue_rvalue.h"
 #include "perfectforwarding.h"
 #include "bind.h"
+#include "bitmap.h"
+
+using namespace BMP;
 
 //MVC Model-View-Controller
 #include "view.h"
@@ -852,11 +855,29 @@ int main(int argc, char *argv[])
         testBind();
     }
 
-   */
     //pointers
     {
         //testUniquePointer();
         testSharedPointer();
+    }*/
+
+    //Fractal
+    {
+        int WIDTH = 800;
+        int HEIGHT = 600;
+
+        Bitmap bitmap(WIDTH, HEIGHT);
+
+        bitmap.setPixel(WIDTH/2, HEIGHT/2, 255, 255, 255);
+
+        for (int y=0; y<HEIGHT; y++) {
+            for (int x=0; x<WIDTH; x++) {
+                bitmap.setPixel(x, y, 255, 0, 0);
+            }
+        }
+
+        bitmap.write("fractal.bmp");
+        cout << "Finished." << endl;
     }
 
     requireEnter();
