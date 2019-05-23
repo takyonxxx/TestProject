@@ -62,15 +62,15 @@ A class has all members private by default. A struct is a class where members ar
 #include "lvalue_rvalue.h"
 #include "perfectforwarding.h"
 #include "bind.h"
-#include "bitmap.h"
+#include "fractal.h"
 
-using namespace BMP;
 
 //MVC Model-View-Controller
 #include "view.h"
 #include "model.h"
 #include "controller.h"
 #include "common.h"
+
 
 extern int ex_a;  // external outside, here we do not reserve memory for variable ex_a;
 
@@ -459,7 +459,7 @@ int main(int argc, char *argv[])
         double array[6] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
         vector<double> vect = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
         cout << Average(array, 6) << endl;
-        cout << GetMaxValue(array, 6) << endl;        
+        cout << GetMaxValue(array, 6) << endl;
         cout << *(array + 1) << endl; // array is pointer. result 2
         cout << Add<double, double>(2, 5.2) << endl;
 
@@ -863,21 +863,8 @@ int main(int argc, char *argv[])
 
     //Fractal
     {
-        int WIDTH = 800;
-        int HEIGHT = 600;
-
-        Bitmap bitmap(WIDTH, HEIGHT);
-
-        bitmap.setPixel(WIDTH/2, HEIGHT/2, 255, 255, 255);
-
-        for (int y=0; y<HEIGHT; y++) {
-            for (int x=0; x<WIDTH; x++) {
-                bitmap.setPixel(x, y, 255, 0, 0);
-            }
-        }
-
-        bitmap.write("fractal.bmp");
-        cout << "Finished." << endl;
+        Fractal f;
+        f.drawFractal();
     }
 
     requireEnter();

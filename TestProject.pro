@@ -6,8 +6,13 @@ CONFIG -= qt
 SOURCES += \
         bitmap.cpp \
         complex.cpp \
+        fractal.cpp \
+        fractalcreator.cpp \
         main.cpp \
-        object.cpp
+        mandelbrot.cpp \
+        object.cpp \
+        rgb.cpp \
+        zoomlist.cpp
 
 HEADERS += \
     accessmodifiers.h \
@@ -29,6 +34,8 @@ HEADERS += \
     enhancedloops.h \
     enumaration.h \
     exceptions.h \
+    fractal.h \
+    fractalcreator.h \
     functional.h \
     functors.h \
     inheritance.h \
@@ -38,6 +45,7 @@ HEADERS += \
     libraries.h \
     linkedlist.h \
     lvalue_rvalue.h \
+    mandelbrot.h \
     model.h \
     namespace.h \
     nestedtemplate.h \
@@ -51,9 +59,15 @@ HEADERS += \
     polymorphism.h \
     pragmadirective.h \
     racingexample.h \
+    rgb.h \
     singleton.h \
     stack_queue.h \
     stream.h \
     template.h \
     vectors_maps.h \
-    view.h
+    view.h \
+    zoom.h \
+    zoomlist.h
+
+DISTFILES += \
+    ../build-TestProject/fractal.bmp

@@ -3,8 +3,9 @@
 #include "bitmapinfoheader.h"
 #include "bitmapfileheader.h"
 
-using namespace BMP;
-namespace BMP
+using namespace std;
+
+namespace  GP
 {
 
 Bitmap::Bitmap(int width, int height)
@@ -65,4 +66,3 @@ Bitmap::~Bitmap()
 }
 
 }
-

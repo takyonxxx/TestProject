@@ -1,11 +1,12 @@
-#ifndef FRACTAL_H
-#define FRACTAL_H
+#ifndef BITMAP_H
+#define BITMAP_H
+#include "iostream"
 #include "string"
 #include <cstdint>
 #include <memory>
 using namespace std;
 
-namespace BMP
+namespace GP
 {
 
 class Bitmap
@@ -18,10 +19,11 @@ public:
     Bitmap(int width, int height);
     void setPixel(int x, int y, uint8_t red, uint8_t green, uint8_t blue);
     bool write(string filename);
+    void createFractal();
     virtual ~Bitmap();
 };
-
 }
+
 
 
 #endif // FRACTAL_H
