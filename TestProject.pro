@@ -69,6 +69,3 @@ HEADERS += \
     template.h \
     vectors_maps.h \
     view.h
-
-DISTFILES += \
-    ../build-TestProject/fractal.bmp
