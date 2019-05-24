@@ -4,23 +4,29 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-        bitmap.cpp \
-        complex.cpp \
-        fractal.cpp \
-        fractalcreator.cpp \
-        main.cpp \
-        mandelbrot.cpp \
-        object.cpp \
-        rgb.cpp \
-        zoomlist.cpp
+    complex.cpp \
+    fractal.cpp \
+    main.cpp \
+    object.cpp \
+    Fractal/Bitmap.cpp \
+    Fractal/FractalCreator.cpp \
+    Fractal/Mandelbrot.cpp \
+    Fractal/RGB.cpp \
+    Fractal/ZoomList.cpp
+
 
 HEADERS += \
+    Fractal/Bitmap.h \
+    Fractal/BitmapFileHeader.h \
+    Fractal/BitmapInfoHeader.h \
+    Fractal/FractalCreator.h \
+    Fractal/Mandelbrot.h \
+    Fractal/RGB.h \
+    Fractal/Zoom.h \
+    Fractal/ZoomList.h \
     accessmodifiers.h \
     algorithm.h \
-    bind.h \
-    bitmap.h \
-    bitmapfileheader.h \
-    bitmapinfoheader.h \
+    bind.h \   
     casting.h \
     chainofresponsibility.h \
     common.h \
@@ -34,8 +40,7 @@ HEADERS += \
     enhancedloops.h \
     enumaration.h \
     exceptions.h \
-    fractal.h \
-    fractalcreator.h \
+    fractal.h \    
     functional.h \
     functors.h \
     inheritance.h \
@@ -44,8 +49,7 @@ HEADERS += \
     lambda.h \
     libraries.h \
     linkedlist.h \
-    lvalue_rvalue.h \
-    mandelbrot.h \
+    lvalue_rvalue.h \    
     model.h \
     namespace.h \
     nestedtemplate.h \
@@ -58,16 +62,13 @@ HEADERS += \
     pointers.h \
     polymorphism.h \
     pragmadirective.h \
-    racingexample.h \
-    rgb.h \
+    racingexample.h \   
     singleton.h \
     stack_queue.h \
     stream.h \
     template.h \
     vectors_maps.h \
-    view.h \
-    zoom.h \
-    zoomlist.h
+    view.h
 
 DISTFILES += \
     ../build-TestProject/fractal.bmp

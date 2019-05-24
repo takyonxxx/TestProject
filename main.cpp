@@ -104,21 +104,35 @@ int main(int argc, char *argv[])
         if(strcmp(argv[i], "-h") == 0 && i == 1) showHelp();
     }
 
+    //io
     {
-        std::cout << "Current C++ version is: ";
-        if (__cplusplus == 201703L) std::cout << "C++17\n";
-        else if (__cplusplus == 201402L) std::cout << "C++14\n";
-        else if (__cplusplus == 201103L) std::cout << "C++11\n";
-        else if (__cplusplus == 199711L) std::cout << "C++98\n";
-        else std::cout << "pre-standard C++\n";
+        char cont = {};
+        do
+        {
+            system("cls");
+
+            std::cout << "Current C++ version is: ";
+            if (__cplusplus == 201703L) std::cout << "C++17\n";
+            else if (__cplusplus == 201402L) std::cout << "C++14\n";
+            else if (__cplusplus == 201103L) std::cout << "C++11\n";
+            else if (__cplusplus == 199711L) std::cout << "C++98\n";
+            else std::cout << "pre-standard C++\n";
+
+            printTypes();
+
+            cout << "Do you want to print again? (Y/N)" << endl;
+            cin >> cont;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        }while(cont != 'n' && cont != 'N');
     }
 
-    /*
 
     //cout << 132 % 3 << endl; // Modulus, remaining
 
     //Access Modifiers
-    {
+    /*{
         //public
         Circle_Public obj;
         // accessing public datamember outside class
@@ -150,22 +164,6 @@ int main(int argc, char *argv[])
         Encapsulation obj;
         obj.set(5);
         cout << "Encapsulation: get() " << obj.get() << endl;
-    }
-
-    //io
-    {
-        char cont = {};
-        do
-        {
-            //system("cls");
-            printTypes();
-
-            cout << "Do you want to print again? (Y/N)" << endl;
-            cin >> cont;
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-        }while(cont != 'n' && cont != 'N');
     }
 
     //RacingExample
@@ -859,13 +857,13 @@ int main(int argc, char *argv[])
     {
         //testUniquePointer();
         testSharedPointer();
-    }*/
+    }
 
     //Fractal
     {
         Fractal f;
         f.drawFractal();
-    }
+    }*/
 
     requireEnter();
     return 0;

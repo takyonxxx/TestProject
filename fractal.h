@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <memory>
 #include <math.h> //pow
+
 class Fractal
 {
 public:
